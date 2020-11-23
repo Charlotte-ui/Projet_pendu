@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Projet_pendu/1.0.0": {
+        "runtime": {
+          "Projet_pendu.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Projet_pendu/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
