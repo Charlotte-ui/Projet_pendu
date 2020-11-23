@@ -42,6 +42,7 @@ namespace Projet_pendu
         }
 
         public static void chargeDictionnaire (string adresse) {
+            dictionnaire = new List<string>();
             try 
             { 
                 System.Text.Encoding encoding = System.Text.Encoding.GetEncoding("iso-8859-1");
@@ -72,7 +73,56 @@ namespace Projet_pendu
 
 
         public static void dessinePendu (int taille){
+            CentrerLeTexte(" _______");
+            CentrerLeTexte(" |/   | ");
+            switch (taille) {
+            case 0 :
+                CentrerLeTexte(" |      ");
+                CentrerLeTexte(" |      ");
+                CentrerLeTexte(" |      ");
+                CentrerLeTexte(" |      ");
+                break;
+            case 1 :
+            CentrerLeTexte(" |    O ");
+            CentrerLeTexte(" |      ");
+            CentrerLeTexte(" |      ");
+            break;
+            case 2 :
+            CentrerLeTexte(" |    O ");
+            CentrerLeTexte(" |   -| ");
+            CentrerLeTexte(" |      ");
+            break;
+            case 3 :
+            CentrerLeTexte(" |    O ");
+            CentrerLeTexte(" |   -|-");
+            CentrerLeTexte(" |      ");
+            break;
+            case 4 :
+            CentrerLeTexte(" |    O ");
+            CentrerLeTexte(" |   -|-");
+            CentrerLeTexte(" |    / ");
+            break;
+            case 5 :
+            CentrerLeTexte(" |    O ");
+            CentrerLeTexte(" |   -|-");
+            CentrerLeTexte(" |    /\\");
+            break;
+            }
+
+
+
+            CentrerLeTexte("-----------");
+
+
+
+
             
+        }
+
+        private static void CentrerLeTexte(string texte){
+            int nbEspaces = (Console.WindowWidth - texte.Length) / 2;
+            Console.SetCursorPosition(nbEspaces, Console.CursorTop);
+            Console.WriteLine(texte);
         }
 
         public static void demandeNom (ref string nom, string message){
