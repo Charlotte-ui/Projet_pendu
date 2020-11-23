@@ -1,12 +1,160 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Projet_pendu
 {
     class Program
     {
+        public const bool CHOIX_MOT = true;
+        public const bool DEVINE = false;
+        public const int MAX_PENDU = 5 ;
+        public const string ADRESSE_DICO = "dicoFR.txt" ;
+
+
+        public static List<string> lettresDejaJouees;
+        public static List<string> dictionnaire;
+
+
+
+
+        public static struct Joueur {
+            public string nom;
+            public bool robot;
+            public int nbVictoire;
+            public bool role ; //true choisit mot, false devine
+        }
+
+        public static string JoueCoup (Joueur j) {
+            return "";
+        }
+
+        public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
+            return false;
+        }
+
+        public static bool deepEqualsTabChar (char[] tab1, char[] tab2) {
+            return false;
+        }
+
+        public static void chargeDictionnaire (string adresse) {
+
+        }
+
+        public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
+        }
+
+        public static void afficheTab (char[] tab){
+
+        }
+
+
+        public static void dessinePendu (int taille){
+            
+        }
+
+        public static void demandeNom (ref string nom, string message){
+            Console.WriteLine("Quelle est le nom {0} ?",message);
+            nom= Console.ReadLine();
+        }
+
+
+
+
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            int choixModeJeu;
+            int taillePendu=0;
+            bool stop=false;
+            bool perdu = false;
+            string coup;
+            char [] mot, lettresDecouvertes;
+            Joueur j1 = new Joueur();
+            Joueur j2 = new Joueur();
+            chargeDictionnaire(ADRESSE_DICO);
+
+            Console.WriteLine("Vous désirez jouer avec : deux ordinateurs [1], deux humains [2], un ordinateur contre un humain [3] ?");
+            while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 ||  choixModeJeu>3 ){
+                Console.WriteLine("Valeur erronée, veuillez entrer un entier 1, 2 ou 3 en fonction du mode de jeu désiré.");
+            } 
+
+            switch (choixModeJeu) {
+                case 1:
+                j1.nom="HAL";
+                j2.nom="Skynet";
+                j1.robot=true;
+                j2.robot=true;
+                break;
+                case 2:
+                demandeNom(ref j1.nom,"du premier joueur");
+                demandeNom(ref j2.nom,"du second joueur");
+                j1.robot=false;
+                j2.robot=false;
+                break;
+                case 3:
+                demandeNom(ref j1.nom,"du premier joueur");
+                j2.nom="Skynet";
+                j1.robot=false;
+                j2.robot=true;
+                break;
+
+            }
+            j1.role = (new Random().Next(0, 2) ==0)? CHOIX_MOT: DEVINE;
+            j2.role = !j1.role;
+
+            while (!stop){
+                if (j1.role=CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
+                else choixMot(j2,out mot, out lettresDecouvertes);
+
+                while (!perdu || !deepEqualsTabChar(mot,lettresDecouvertes)){
+                    dessinePendu(taillePendu);
+                    afficheTab(lettresDecouvertes);
+                    
+                    if (j1.role=DEVINE)  coup=JoueCoup(j1);
+                    else coup=JoueCoup(j2);
+
+                    if (coup.Length==1){
+                        if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
+                            taillePendu++;
+                        }
+                    }
+                    else {
+                        if (deepEqualsTabChar(coup.ToCharArray(),mot)){
+                            lettresDecouvertes=mot;
+                        }
+                        else {
+                            perdu=true;
+                        }
+                    }                              
+                }
+
+                Console.Write((!j1.role)?j1.nom:j2.nom);
+                if (perdu){
+                    Console.WriteLine (", vous avez perdu ! le mot a deviner était :");
+                    afficheTab(mot);
+                }
+                else {
+                    Console.WriteLine (", vous avez gagné !");
+                    if (j1.role=DEVINE) j1.nbVictoire++;
+                    else j2.nbVictoire++;
+                }
+
+
+            Console.WriteLine(" deux humains [2], un ordinateur contre un humain [3] ?");
+            while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 ||  choixModeJeu>3 ){
+                Console.WriteLine("Valeur erronée, veuillez entrer un entier 1, 2 ou 3 en fonction du mode de jeu désiré.");
+            }
+
+
+
+
+
+
+            }
+
+
+
+
         }
     }
 }
