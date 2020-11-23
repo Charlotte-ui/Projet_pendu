@@ -17,7 +17,7 @@ namespace Projet_pendu
 
 
 
-        public static struct Joueur {
+        public struct Joueur {
             public string nom;
             public bool robot;
             public int nbVictoire;
@@ -65,7 +65,7 @@ namespace Projet_pendu
         {
             int choixModeJeu;
             int taillePendu=0;
-            bool stop=false;
+            bool continuerAJouer=true;
             bool perdu = false;
             string coup;
             char [] mot, lettresDecouvertes;
@@ -102,7 +102,7 @@ namespace Projet_pendu
             j1.role = (new Random().Next(0, 2) ==0)? CHOIX_MOT: DEVINE;
             j2.role = !j1.role;
 
-            while (!stop){
+            while (continuerAJouer){
                 if (j1.role=CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
                 else choixMot(j2,out mot, out lettresDecouvertes);
 
@@ -140,17 +140,23 @@ namespace Projet_pendu
                 }
 
 
-            Console.WriteLine(" deux humains [2], un ordinateur contre un humain [3] ?");
-            while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 ||  choixModeJeu>3 ){
-                Console.WriteLine("Valeur erronée, veuillez entrer un entier 1, 2 ou 3 en fonction du mode de jeu désiré.");
+            Console.WriteLine(" Voulez-vous faire une nouvelle partie [true/false] ?");
+            while (!bool.TryParse(Console.ReadLine(),out continuerAJouer)){
+                Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
             }
 
+            j1.role=!j1.role;
+            j2.role=!j2.role;
 
+            lettresDejaJouees.Clear();
 
-
-
-
+            dictionnaire.Remove(new String(mot));
             }
+
+            Console.WriteLine("Fin de partie \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
+
+
+
 
 
 
