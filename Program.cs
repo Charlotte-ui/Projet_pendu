@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO ;
 
 namespace Projet_pendu
 {
@@ -33,11 +34,30 @@ namespace Projet_pendu
         }
 
         public static bool deepEqualsTabChar (char[] tab1, char[] tab2) {
-            return false;
+            if (tab1.Length != tab2.Length ) return false;
+            for (int i=0; i<tab1.Length;i++){
+                if (tab1[i]!=tab2[i]) return false;
+            }
+            return true;
         }
 
         public static void chargeDictionnaire (string adresse) {
-
+            try 
+            { 
+                System.Text.Encoding encoding = System.Text.Encoding.GetEncoding("iso-8859-1");
+                StreamReader monStreamReader = new StreamReader(adresse,encoding); 
+                string mot = monStreamReader.ReadLine(); 
+                while (mot != null) { 
+                    dictionnaire.Add(mot);
+                    mot = monStreamReader.ReadLine();
+                } 
+                monStreamReader.Close(); 
+            } 
+            catch (Exception ex) 
+            { 
+                Console.Write("Une erreur est survenue au cours de la lecture :"); 
+                Console.WriteLine(ex.Message); 
+            } 
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
@@ -55,6 +75,7 @@ namespace Projet_pendu
 						k++;
 					}
 				}
+
         }
 
         public static void afficheTab (char[] tab){
