@@ -1,0 +1,13 @@
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu.deps.json
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu.runtimeconfig.json
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu.runtimeconfig.dev.json
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu.dll
+/home/chacha/GitHub/Projet_pendu/bin/Debug/netcoreapp3.1/Projet_pendu.pdb
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.csprojAssemblyReference.cache
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.AssemblyInfoInputs.cache
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.AssemblyInfo.cs
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.csproj.CoreCompileInputs.cache
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.dll
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.pdb
+/home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.genruntimeconfig.cache

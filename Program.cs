@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO ;
 
 namespace Projet_pendu
 {
@@ -37,10 +38,28 @@ namespace Projet_pendu
         }
 
         public static void chargeDictionnaire (string adresse) {
-
+            try 
+            { 
+                System.Text.Encoding encoding = System.Text.Encoding.GetEncoding("iso-8859-1");
+                StreamReader monStreamReader = new StreamReader(adresse,encoding); 
+                string mot = monStreamReader.ReadLine(); 
+                while (mot != null) { 
+                    dictionnaire.Add(mot);
+                    mot = monStreamReader.ReadLine();
+                } 
+                monStreamReader.Close(); 
+            } 
+            catch (Exception ex) 
+            { 
+                Console.Write("Une erreur est survenue au cours de la lecture :"); 
+                Console.WriteLine(ex.Message); 
+            } 
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
+            mot = new char[0];
+            lettresDecouvertes = new char[0];
+
         }
 
         public static void afficheTab (char[] tab){
