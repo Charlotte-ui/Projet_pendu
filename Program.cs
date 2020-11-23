@@ -34,7 +34,11 @@ namespace Projet_pendu
         }
 
         public static bool deepEqualsTabChar (char[] tab1, char[] tab2) {
-            return false;
+            if (tab1.Length != tab2.Length ) return false;
+            for (int i=0; i<tab1.Length;i++){
+                if (tab1[i]!=tab2[i]) return false;
+            }
+            return true;
         }
 
         public static void chargeDictionnaire (string adresse) {
