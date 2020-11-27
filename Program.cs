@@ -25,9 +25,40 @@ namespace Projet_pendu
             public bool role ; //true choisit mot, false devine
         }
 
+        // reste le test de si contient des caractères non autorisés
         public static string JoueCoup (Joueur j) {
-            return "";
+            string reponse;
+            if (j.robot){
+                return CoupAleatoire ();
+            }
+            else {
+                Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? ", j.nom);
+                reponse = Console.ReadLine();
+                while (lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse)){
+                    if (!isChaineLegal(reponse))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
+                    else Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
+                    reponse = Console.ReadLine();               
+                }
+                if (reponse.Length==1) lettresDejaJouees.Add(reponse) ;
+            }
+            return reponse;
         }
+
+        public static string CoupAleatoire (){
+            string reponse="";
+            while (lettresDejaJouees.Contains(reponse)){
+                int i = new Random().Next(97, 123);
+                char c = (char) i;
+                reponse = c.ToString();
+            }
+            lettresDejaJouees.Add(reponse);
+            return reponse;
+        }
+
+        // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
+        public static bool isChaineLegal (string s){
+            return true;
+        } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
             return false;
@@ -239,13 +270,6 @@ namespace Projet_pendu
             }
 
             Console.WriteLine("Fin de partie \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
-
-
-
-
-
-
-
         }
     }
 }
