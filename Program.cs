@@ -6,13 +6,14 @@ namespace Projet_pendu
 {
     class Program
     {
+        public const bool VERBOSE = true;
         public const bool CHOIX_MOT = true;
         public const bool DEVINE = false;
         public const int MAX_PENDU = 5 ;
         public const string ADRESSE_DICO = "dicoFR.txt" ;
 
 
-        public static List<string> lettresDejaJouees;
+        public static List<string> lettresDejaJouees = new List<string>();
         public static List<string> dictionnaire;
 
 
@@ -27,11 +28,15 @@ namespace Projet_pendu
 
         // reste le test de si contient des caractères non autorisés
         public static string JoueCoup (Joueur j) {
+            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
             if (j.robot){
+                if (VERBOSE) Console.WriteLine("le robot joue un coup");
+                Console.Write(j.nom);
                 return CoupAleatoire ();
             }
             else {
+                if (VERBOSE) Console.WriteLine("l'humain joue un coup");
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? ", j.nom);
                 reponse = Console.ReadLine();
                 while (lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse)){
@@ -44,13 +49,15 @@ namespace Projet_pendu
             return reponse;
         }
 
-        public static string CoupAleatoire (){
-            string reponse="";
-            while (lettresDejaJouees.Contains(reponse)){
+        public static string CoupAleatoire (){    
+            string reponse;
+            do {
                 int i = new Random().Next(97, 123);
                 char c = (char) i;
                 reponse = c.ToString();
             }
+            while (lettresDejaJouees.Contains(reponse));
+            Console.WriteLine(" joue la lettre {0}",reponse);
             lettresDejaJouees.Add(reponse);
             return reponse;
         }
@@ -61,6 +68,7 @@ namespace Projet_pendu
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
+            if (VERBOSE) Console.WriteLine("entrée dans isLettreDansMot");
             bool res=false;
             for (int i=0; i<mot.Length;i++){
                 if (mot[i]==lettre) {
@@ -100,7 +108,8 @@ namespace Projet_pendu
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
-	        char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
+	        
+            /**char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
 			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};
 				mot = (Console.ReadLine()).ToCharArray();
 				lettresDecouvertes = new char [] { 'a', 'b', 'c'};
@@ -113,17 +122,21 @@ namespace Projet_pendu
 						}
 						k++;
 					}
-				}
+				}**/
+
+
+                mot = new char[] {'c','h','a','t'};
+                lettresDecouvertes = new char[] {'_','_','_','_'};
 
         }
 
         public static void afficheTab (char[] tab){
             foreach(char lettre in tab){
                 Console.Write(lettre);
+                if (lettre=='_') Console.Write(" ");
             }
             Console.WriteLine();
         }
-
 
         public static void dessinePendu (int taille){
             CentrerLeTexte(" _______");
@@ -229,15 +242,15 @@ namespace Projet_pendu
             j2.role = !j1.role;
 
             while (continuerAJouer){
-                if (j1.role=CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
-                else choixMot(j2,out mot, out lettresDecouvertes);
+                if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
+                else                   choixMot(j2,out mot, out lettresDecouvertes);
 
-                while (!perdu || !deepEqualsTabChar(mot,lettresDecouvertes)){
+                while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
                     dessinePendu(taillePendu);
                     afficheTab(lettresDecouvertes);
                     
-                    if (j1.role=DEVINE)  coup=JoueCoup(j1);
-                    else coup=JoueCoup(j2);
+                    if (j1.role==DEVINE)  coup=JoueCoup(j1);
+                    else                  coup=JoueCoup(j2);
 
                     if (coup.Length==1){
                         if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
@@ -251,11 +264,13 @@ namespace Projet_pendu
                         else {
                             perdu=true;
                         }
-                    }                              
+                    }
+                    if (taillePendu==MAX_PENDU) perdu=true;                         
                 }
 
-                Console.Write((!j1.role)?j1.nom:j2.nom);
+                Console.Write((j1.role==DEVINE)?j1.nom:j2.nom);
                 if (perdu){
+                    dessinePendu(taillePendu);
                     Console.WriteLine (", vous avez perdu ! le mot a deviner était :");
                     afficheTab(mot);
                 }
