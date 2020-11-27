@@ -111,7 +111,10 @@ namespace Projet_pendu
         }
 
         public static void afficheTab (char[] tab){
-
+            foreach(char lettre in tab){
+                Console.Write(lettre);
+            }
+            Console.WriteLine();
         }
 
 
