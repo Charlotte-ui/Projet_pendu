@@ -242,9 +242,11 @@ namespace Projet_pendu
             j2.role = !j1.role;
 
             while (continuerAJouer){
+                // choix du mot à faire deviner
                 if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
-                else                   choixMot(j2,out mot, out lettresDecouvertes);
+                else                    choixMot(j2,out mot, out lettresDecouvertes);
 
+                // l'autre joueur tente de deviner avec max 5 erreurs
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
                     dessinePendu(taillePendu);
                     afficheTab(lettresDecouvertes);
@@ -268,30 +270,33 @@ namespace Projet_pendu
                     if (taillePendu==MAX_PENDU) perdu=true;                         
                 }
 
-                Console.Write((j1.role==DEVINE)?j1.nom:j2.nom);
                 if (perdu){
                     dessinePendu(taillePendu);
-                    Console.WriteLine (", vous avez perdu ! le mot a deviner était :");
+                    Console.WriteLine ("{0}, vous avez perdu ! le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
                     afficheTab(mot);
                 }
                 else {
-                    Console.WriteLine (", vous avez gagné !");
-                    if (j1.role=DEVINE) j1.nbVictoire++;
+                    Console.WriteLine ("{0}, vous avez gagné !",(j1.role==DEVINE)?j1.nom:j2.nom);
+                    if (j1.role==DEVINE) j1.nbVictoire++;
                     else j2.nbVictoire++;
                 }
 
 
-            Console.WriteLine(" Voulez-vous faire une nouvelle partie [true/false] ?");
-            while (!bool.TryParse(Console.ReadLine(),out continuerAJouer)){
-                Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
-            }
+                Console.WriteLine(" Voulez-vous faire une nouvelle partie [true/false] ?");
+                while (!bool.TryParse(Console.ReadLine(),out continuerAJouer)){
+                    Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
+                }
 
-            j1.role=!j1.role;
-            j2.role=!j2.role;
+                j1.role=!j1.role;
+                j2.role=!j2.role;
 
-            lettresDejaJouees.Clear();
+                //réinitialisation des variable
+                lettresDejaJouees.Clear();
+                dictionnaire.Remove(new String(mot));
+                perdu = false ;
+                taillePendu=0;
+                
 
-            dictionnaire.Remove(new String(mot));
             }
 
             Console.WriteLine("Fin de partie \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
