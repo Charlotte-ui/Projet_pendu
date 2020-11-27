@@ -61,7 +61,14 @@ namespace Projet_pendu
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
-            return false;
+            bool res=false;
+            for (int i=0; i<mot.Length;i++){
+                if (mot[i]==lettre) {
+                    lettresDecouvertes[i]=lettre;
+                    res=true;
+                }
+            }
+            return res;
         }
 
         public static bool deepEqualsTabChar (char[] tab1, char[] tab2) {
