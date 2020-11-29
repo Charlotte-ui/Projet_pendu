@@ -100,11 +100,19 @@ namespace Projet_pendu
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
-	        char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
-			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};
+	        /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
+			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};*/
+				Random rndIndex = new Random();
+				if(j.robot == true){
+					indexDico = rndIndex(0, dictionnaire.Size());
+					
+				}
+				else{
+					if(j.robot == false)
+				}
 				mot = (Console.ReadLine()).ToCharArray();
 				lettresDecouvertes = new char [] { 'a', 'b', 'c'};
-				for(int i = 0; i < mot.Length-1; i++){
+				/*for(int i = 0; i < mot.Length-1; i++){
 					int k = 0;
 					bool onPasseAuCaracSuiv = false;
 					while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
@@ -113,7 +121,15 @@ namespace Projet_pendu
 						}
 						k++;
 					}
+				}*/
+				if(dictionnaire.Contains(mot)){
+
+				} 
+				else{
+
 				}
+
+
 
         }
 
