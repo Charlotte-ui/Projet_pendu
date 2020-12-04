@@ -61,6 +61,15 @@ namespace Projet_pendu
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
         public static bool isChaineLegal (string s){
+            string specialChar = @"\|!#$%&/()=?»«@£§€{}.;'<>_,àéèù";
+            foreach (var item in specialChar)
+            {
+                if (s.Contains(item))
+                {
+                    Console.Writeline("Erreur : La chaîne entrée est invalide (caractères spéciaux)");
+                    return false;
+                }
+            }
             return true;
         } 
 
@@ -134,18 +143,6 @@ namespace Projet_pendu
                     }
 				}
 				lettresDecouvertes = new char [] { '_', '_', '_'};
-            /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
-			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};
-            for(int i = 0; i < mot.Length-1; i++){
-                int k = 0;
-                bool onPasseAuCaracSuiv = false;
-                while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
-                    if(mot[i] == alphabet[k]){ 
-                        onPasseAuCaracSuiv = true;
-                    }
-                    k++;
-                }
-            }*/
         }
 
         public static void afficheTab (char[] tab){
