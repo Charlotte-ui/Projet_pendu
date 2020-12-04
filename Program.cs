@@ -11,7 +11,6 @@ namespace Projet_pendu
         public const bool DEVINE = false;
         public const int MAX_PENDU = 5 ;
         public const string ADRESSE_DICO = "dicoFR.txt" ;
-
         public static List<string> dictionnaire;
 
 
@@ -36,11 +35,11 @@ namespace Projet_pendu
             else {
                 if (VERBOSE) Console.WriteLine("l'humain joue un coup");
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? ", j.nom);
-                reponse = Console.ReadLine();
+                reponse = Console.ReadLine().ToUpper();
                 while (lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse)){
                     if (!isChaineLegal(reponse))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
                     else Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
-                    reponse = Console.ReadLine();               
+                    reponse = Console.ReadLine().ToUpper();               
                 }
                 if (reponse.Length==1) lettresDejaJouees.Add(reponse) ;
             }
@@ -50,7 +49,7 @@ namespace Projet_pendu
         public static string CoupAleatoire (List<string> lettresDejaJouees){    
             string reponse;
             do {
-                int i = new Random().Next(97, 123);
+                int i = new Random().Next(65, 91);
                 char c = (char) i;
                 reponse = c.ToString();
             }
@@ -114,7 +113,6 @@ namespace Projet_pendu
 				for(int i = 0; i < mot.Length-1; i++){
 					int k = 0;
 					bool onPasseAuCaracSuiv = false;
-					while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
 						if(mot[i] == alphabet[k]){ 
 							onPasseAuCaracSuiv = true;
 						}
@@ -123,7 +121,7 @@ namespace Projet_pendu
 				}**/
 
 
-                mot = new char[] {'c','h','a','t'};
+                mot = new char[] {'C','H','A','T'};
                 lettresDecouvertes = new char[] {'_','_','_','_'};
 
         }
@@ -135,6 +133,15 @@ namespace Projet_pendu
             }
             Console.WriteLine();
         }
+
+        public static void afficheListe (List<string> l, int limite){
+            for (int i=0;i<limite;i++){
+                Console.Write(l[i]);
+                Console.Write(" ");
+            }
+            Console.WriteLine();
+        }
+
 
         public static void dessinePendu (int taille){
             CentrerLeTexte(" _______");
@@ -250,6 +257,9 @@ namespace Projet_pendu
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
                     dessinePendu(taillePendu);
                     afficheTab(lettresDecouvertes);
+                    Console.Write("Lettes déjà jouées : ");
+                    afficheListe(lettresDejaJouees,27);
+
                     
                     if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees);
                     else                  coup=JoueCoup(j2,lettresDejaJouees);
