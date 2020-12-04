@@ -1,6 +1,9 @@
+
 using System;
 using System.Collections.Generic;
 using System.IO ;
+using System.Linq;
+using System.Collections;
 
 namespace Projet_pendu
 {
@@ -24,13 +27,13 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-        public static string JoueCoup (Joueur j,List<string> lettresDejaJouees) {
-            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
+         public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
             if (j.robot){
                 if (VERBOSE) Console.WriteLine("le robot joue un coup");
                 Console.Write(j.nom);
-                return CoupAleatoire (lettresDejaJouees);
+                //return CoupAleatoire (lettresDejaJouees);
+                return CoupIntelligent(lettresDejaJouees,lettresDecouvertes);
             }
             else {
                 if (VERBOSE) Console.WriteLine("l'humain joue un coup");
@@ -58,6 +61,63 @@ namespace Projet_pendu
             lettresDejaJouees.Add(reponse);
             return reponse;
         }
+      
+              public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
+            List<char> lettresAbsentes = new List<char>();
+            List<string> motCompatibles = new List<string>();
+
+            foreach (string s in lettresDejaJouees)
+            {
+                if(!lettresDecouvertes.Contains(Char.Parse(s))) lettresAbsentes.Add(Char.Parse(s));
+            }
+
+            foreach(string mot in dictionnaire){
+                if (estCompatible(mot,lettresDecouvertes,lettresAbsentes)){
+                    motCompatibles.Add(mot);
+                }
+            }
+
+            if (motCompatibles.Count()==1) return motCompatibles[0];
+
+            Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>();
+            int prioriteMax=1;
+            char lettreLaPlusPrioritaire='?';
+
+            foreach(string mot in motCompatibles){
+                foreach (char lettre in mot)
+                {
+                    if (!lettresDecouvertes.Contains(lettre)){
+                        if (lettresPriorisees.ContainsKey(lettre)){
+                            lettresPriorisees[lettre]++;
+                            if (lettresPriorisees[lettre]>prioriteMax){
+                               prioriteMax=lettresPriorisees[lettre] ;
+                               lettreLaPlusPrioritaire=lettre;
+                            }
+                        }
+                        else {
+                            lettresPriorisees.Add(lettre,1);
+                            if (lettreLaPlusPrioritaire=='?') lettreLaPlusPrioritaire=lettre;
+                        }
+                    }
+
+                }
+            }
+            lettresDejaJouees.Add(lettreLaPlusPrioritaire.ToString());
+            return lettreLaPlusPrioritaire.ToString();
+        }
+
+
+        public static bool estCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
+            if (mot.Length != lettresDecouvertes.Length) return false;
+            for (int i=0; i<mot.Length;i++) {
+                if (lettresDecouvertes[i]!='_' && lettresDecouvertes[i]!=mot[i]) return false;
+                if (lettresAbsentes.Contains(mot[i])) return false;
+            }
+            return true;
+        }
+
+
+      
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
         public static bool isChaineLegal (string s){
@@ -157,6 +217,7 @@ namespace Projet_pendu
         }
 
         public static void afficheListe (List<string> l, int limite){
+                       if (l.Count<limite) limite=l.Count;
             for (int i=0;i<limite;i++){
                 Console.Write(l[i]);
                 Console.Write(" ");
@@ -272,8 +333,8 @@ namespace Projet_pendu
 
             while (continuerAJouer){
                 // choix du mot à faire deviner
-                if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
-                else                    choixMot(j2,out mot, out lettresDecouvertes);
+                if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
+                    else              coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
 
                 // l'autre joueur tente de deviner avec max 5 erreurs
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
