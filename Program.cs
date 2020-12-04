@@ -12,8 +12,6 @@ namespace Projet_pendu
         public const int MAX_PENDU = 5 ;
         public const string ADRESSE_DICO = "dicoFR.txt" ;
 
-
-        public static List<string> lettresDejaJouees = new List<string>();
         public static List<string> dictionnaire;
 
 
@@ -27,13 +25,13 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-        public static string JoueCoup (Joueur j) {
+        public static string JoueCoup (Joueur j,List<string> lettresDejaJouees) {
             if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
             if (j.robot){
                 if (VERBOSE) Console.WriteLine("le robot joue un coup");
                 Console.Write(j.nom);
-                return CoupAleatoire ();
+                return CoupAleatoire (lettresDejaJouees);
             }
             else {
                 if (VERBOSE) Console.WriteLine("l'humain joue un coup");
@@ -49,7 +47,7 @@ namespace Projet_pendu
             return reponse;
         }
 
-        public static string CoupAleatoire (){    
+        public static string CoupAleatoire (List<string> lettresDejaJouees){    
             string reponse;
             do {
                 int i = new Random().Next(97, 123);
@@ -210,6 +208,8 @@ namespace Projet_pendu
             char [] mot, lettresDecouvertes;
             Joueur j1 = new Joueur();
             Joueur j2 = new Joueur();
+            List<string> lettresDejaJouees = new List<string>();
+
             chargeDictionnaire(ADRESSE_DICO);
 
             Console.WriteLine("Vous désirez jouer avec : deux ordinateurs [1], deux humains [2], un ordinateur contre un humain [3] ?");
@@ -251,8 +251,8 @@ namespace Projet_pendu
                     dessinePendu(taillePendu);
                     afficheTab(lettresDecouvertes);
                     
-                    if (j1.role==DEVINE)  coup=JoueCoup(j1);
-                    else                  coup=JoueCoup(j2);
+                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees);
+                    else                  coup=JoueCoup(j2,lettresDejaJouees);
 
                     if (coup.Length==1){
                         if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
