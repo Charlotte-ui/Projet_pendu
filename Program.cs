@@ -9,7 +9,7 @@ namespace Projet_pendu
 {
     class Program
     {
-        public const bool VERBOSE = true;
+        public const bool VERBOSE = false;
         public const bool CHOIX_MOT = true;
         public const bool DEVINE = false;
         public const int MAX_PENDU = 5 ;
@@ -62,7 +62,7 @@ namespace Projet_pendu
             return reponse;
         }
       
-              public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
+        public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
             List<char> lettresAbsentes = new List<char>();
             List<string> motCompatibles = new List<string>();
 
@@ -165,47 +165,40 @@ namespace Projet_pendu
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
-	        
-                //mot = new char[] {'C','H','A','T'};            
+	        int indexDico;
+            bool motAccepte =false;
+            string reponse="1";
 
-				Random rndIndex = new Random();
-				if(j.robot == true){
-					indexDico = rndIndex(0, dictionnaire.Size());
-					mot = dictionnaire[indexDico];
-				}
-				else{
-                    while (!motAccepte) {
-                    bool motAccepte = false;
-                        while (reponse == '1')
-                        {
-                            Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
-                            string reponse = Console.ReadLine();
-                            if (reponse == '1') afficheListe();
-                            else mot = reponse;
-                        }
-                    
-                    if (dictionnaire.Contains(mot)) {
-                        if (isChaineLegal(mot) == true) {
-                            motAccepte = true; 
-                        }
+            //mot = new char[] {'C','H','A','T'};     
+            //lettresDecouvertes = new char [] { '_', '_', '_','_','_'};   
+ 
+			Random rndIndex = new Random();
+			if(j.robot == true){
+				indexDico = rndIndex.Next(0, dictionnaire.Count);
+				mot = dictionnaire[indexDico].ToCharArray();
+			}
+			else{
+                while (!motAccepte) {
+                    while (reponse.Equals("1")){
+                        Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
+                        reponse = Console.ReadLine();
+                        if (reponse.Equals("1")) afficheListe(dictionnaire,100);
                     }
-                    else {
+                    
+                    motAccepte = dictionnaire.Contains(reponse) && isChaineLegal(reponse);
+                    if (!motAccepte) {
                         Console.WriteLine("Le mot est introuvable sur le dictionnaire. Veuillez réessayer.");
                     }
 				}
-				lettresDecouvertes = new char [] { '_', '_', '_'};
-            /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
-			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};
-            for(int i = 0; i < mot.Length-1; i++){
-                int k = 0;
-                bool onPasseAuCaracSuiv = false;
-                while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
-                    if(mot[i] == alphabet[k]){ 
-                        onPasseAuCaracSuiv = true;
-                    }
-                    k++;
-                }
-            }*/
+                mot = reponse.ToCharArray();
+            }
+			lettresDecouvertes = new char [mot.Length] ;
+            for (int i = 0; i < mot.Length; i++)
+            {
+			    lettresDecouvertes[i] = '_';
+                if (mot[i]=='-')lettresDecouvertes[i] = '-';
+            }
+                 
         }
 
         public static void afficheTab (char[] tab){
@@ -227,11 +220,11 @@ namespace Projet_pendu
 
 
         public static void dessinePendu (int taille){
+            Console.Clear();
             CentrerLeTexte(" _______");
             CentrerLeTexte(" |/   | ");
             switch (taille) {
             case 0 :
-                CentrerLeTexte(" |      ");
                 CentrerLeTexte(" |      ");
                 CentrerLeTexte(" |      ");
                 CentrerLeTexte(" |      ");
@@ -240,6 +233,7 @@ namespace Projet_pendu
             CentrerLeTexte(" |    O ");
             CentrerLeTexte(" |      ");
             CentrerLeTexte(" |      ");
+            
             break;
             case 2 :
             CentrerLeTexte(" |    O ");
@@ -264,7 +258,7 @@ namespace Projet_pendu
             }
 
 
-
+            CentrerLeTexte(" |      ");
             CentrerLeTexte("-----------");
 
 
@@ -333,8 +327,8 @@ namespace Projet_pendu
 
             while (continuerAJouer){
                 // choix du mot à faire deviner
-                if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
-                    else              coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
+                if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
+                else                    choixMot(j2,out mot, out lettresDecouvertes);
 
                 // l'autre joueur tente de deviner avec max 5 erreurs
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
@@ -344,8 +338,8 @@ namespace Projet_pendu
                     afficheListe(lettresDejaJouees,27);
 
                     
-                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees);
-                    else                  coup=JoueCoup(j2,lettresDejaJouees);
+                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
+                    else                  coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
 
                     if (coup.Length==1){
                         if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
