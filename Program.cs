@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO ;
 
@@ -100,37 +100,45 @@ namespace Projet_pendu
         }
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
-	        /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
-			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};*/
+	        
 				Random rndIndex = new Random();
 				if(j.robot == true){
 					indexDico = rndIndex(0, dictionnaire.Size());
-					
+					mot = dictionnaire[indexDico];
 				}
 				else{
-					if(j.robot == false)
+                    while (!motAccepte) {
+                    bool motAccepte = false;
+                        while (reponse == '1')
+                        {
+                            Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
+                            string reponse = Console.ReadLine();
+                            if (reponse == '1') afficheListe();
+                            else mot = reponse;
+                        }
+                    
+                    if (dictionnaire.Contains(mot)) {
+                        if (isChaineLegal(mot) == true) {
+                            motAccepte = true; 
+                        }
+                    }
+                    else {
+                        Console.WriteLine("Le mot est introuvable sur le dictionnaire. Veuillez réessayer.");
+                    }
 				}
-				mot = (Console.ReadLine()).ToCharArray();
-				lettresDecouvertes = new char [] { 'a', 'b', 'c'};
-				/*for(int i = 0; i < mot.Length-1; i++){
-					int k = 0;
-					bool onPasseAuCaracSuiv = false;
-					while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
-						if(mot[i] == alphabet[k]){ 
-							onPasseAuCaracSuiv = true;
-						}
-						k++;
-					}
-				}*/
-				if(dictionnaire.Contains(mot)){
-
-				} 
-				else{
-
-				}
-
-
-
+				lettresDecouvertes = new char [] { '_', '_', '_'};
+            /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
+			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};*/
+            /*for(int i = 0; i < mot.Length-1; i++){
+                int k = 0;
+                bool onPasseAuCaracSuiv = false;
+                while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
+                    if(mot[i] == alphabet[k]){ 
+                        onPasseAuCaracSuiv = true;
+                    }
+                    k++;
+                }
+            }*/
         }
 
         public static void afficheTab (char[] tab){
