@@ -1,8 +1,9 @@
-﻿using System.Linq;
-using System.Collections;
+
 using System;
 using System.Collections.Generic;
 using System.IO ;
+using System.Linq;
+using System.Collections;
 
 namespace Projet_pendu
 {
@@ -26,8 +27,7 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-        public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {
-            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
+         public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
             if (j.robot){
                 if (VERBOSE) Console.WriteLine("le robot joue un coup");
@@ -61,16 +61,16 @@ namespace Projet_pendu
             lettresDejaJouees.Add(reponse);
             return reponse;
         }
-
-        public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
+      
+              public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
             List<char> lettresAbsentes = new List<char>();
             List<string> motCompatibles = new List<string>();
-            
+
             foreach (string s in lettresDejaJouees)
             {
                 if(!lettresDecouvertes.Contains(Char.Parse(s))) lettresAbsentes.Add(Char.Parse(s));
             }
-                    
+
             foreach(string mot in dictionnaire){
                 if (estCompatible(mot,lettresDecouvertes,lettresAbsentes)){
                     motCompatibles.Add(mot);
@@ -82,7 +82,7 @@ namespace Projet_pendu
             Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>();
             int prioriteMax=1;
             char lettreLaPlusPrioritaire='?';
-            
+
             foreach(string mot in motCompatibles){
                 foreach (char lettre in mot)
                 {
@@ -99,7 +99,7 @@ namespace Projet_pendu
                             if (lettreLaPlusPrioritaire=='?') lettreLaPlusPrioritaire=lettre;
                         }
                     }
-                    
+
                 }
             }
             lettresDejaJouees.Add(lettreLaPlusPrioritaire.ToString());
@@ -117,6 +117,7 @@ namespace Projet_pendu
         }
 
 
+      
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
         public static bool isChaineLegal (string s){
@@ -165,24 +166,46 @@ namespace Projet_pendu
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        
-            /**char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
+                //mot = new char[] {'C','H','A','T'};            
+
+				Random rndIndex = new Random();
+				if(j.robot == true){
+					indexDico = rndIndex(0, dictionnaire.Size());
+					mot = dictionnaire[indexDico];
+				}
+				else{
+                    while (!motAccepte) {
+                    bool motAccepte = false;
+                        while (reponse == '1')
+                        {
+                            Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
+                            string reponse = Console.ReadLine();
+                            if (reponse == '1') afficheListe();
+                            else mot = reponse;
+                        }
+                    
+                    if (dictionnaire.Contains(mot)) {
+                        if (isChaineLegal(mot) == true) {
+                            motAccepte = true; 
+                        }
+                    }
+                    else {
+                        Console.WriteLine("Le mot est introuvable sur le dictionnaire. Veuillez réessayer.");
+                    }
+				}
+				lettresDecouvertes = new char [] { '_', '_', '_'};
+            /*char[] alphabet={'a','b','c','d','e','f','g','h','i','j','k','l','m',
 			'n','o','p','q','r','s','t','u','v','w','x','y','z',' '};
-				mot = (Console.ReadLine()).ToCharArray();
-				lettresDecouvertes = new char [] { 'a', 'b', 'c'};
-				for(int i = 0; i < mot.Length-1; i++){
-					int k = 0;
-					bool onPasseAuCaracSuiv = false;
-						if(mot[i] == alphabet[k]){ 
-							onPasseAuCaracSuiv = true;
-						}
-						k++;
-					}
-				}**/
-
-
-                mot = new char[] {'C','H','A','T'};
-                lettresDecouvertes = new char[] {'_','_','_','_'};
-
+            for(int i = 0; i < mot.Length-1; i++){
+                int k = 0;
+                bool onPasseAuCaracSuiv = false;
+                while(k < alphabet.Length-1 || onPasseAuCaracSuiv == true){
+                    if(mot[i] == alphabet[k]){ 
+                        onPasseAuCaracSuiv = true;
+                    }
+                    k++;
+                }
+            }*/
         }
 
         public static void afficheTab (char[] tab){
@@ -194,7 +217,7 @@ namespace Projet_pendu
         }
 
         public static void afficheListe (List<string> l, int limite){
-            if (l.Count<limite) limite=l.Count;
+                       if (l.Count<limite) limite=l.Count;
             for (int i=0;i<limite;i++){
                 Console.Write(l[i]);
                 Console.Write(" ");
@@ -310,8 +333,8 @@ namespace Projet_pendu
 
             while (continuerAJouer){
                 // choix du mot à faire deviner
-                if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
-                else                    choixMot(j2,out mot, out lettresDecouvertes);
+                if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
+                    else              coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
 
                 // l'autre joueur tente de deviner avec max 5 erreurs
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
@@ -321,8 +344,8 @@ namespace Projet_pendu
                     afficheListe(lettresDejaJouees,27);
 
                     
-                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
-                    else                  coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
+                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees);
+                    else                  coup=JoueCoup(j2,lettresDejaJouees);
 
                     if (coup.Length==1){
                         if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
