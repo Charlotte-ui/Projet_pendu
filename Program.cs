@@ -1,19 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.IO ;
+using System.Linq;
+using System.Collections;
 
 namespace Projet_pendu
 {
     class Program
     {
-        public const bool VERBOSE = true;
+        public const bool VERBOSE = false;
         public const bool CHOIX_MOT = true;
         public const bool DEVINE = false;
         public const int MAX_PENDU = 5 ;
         public const string ADRESSE_DICO = "dicoFR.txt" ;
+        public const string ADRESSE_REGLES = "regles.txt" ;
         public static List<string> dictionnaire;
+        public static List<string> regles;
 
 
+       public enum Fichier {
+            dictionnaire,
+            regles,
+            dessin
+        }
 
 
         public struct Joueur {
@@ -24,24 +33,30 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-        public static string JoueCoup (Joueur j,List<string> lettresDejaJouees) {
-            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
+         public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            
+             if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
+           // int
             if (j.robot){
                 if (VERBOSE) Console.WriteLine("le robot joue un coup");
                 Console.Write(j.nom);
-                return CoupAleatoire (lettresDejaJouees);
+                //return CoupAleatoire (lettresDejaJouees);
+                return CoupIntelligent(lettresDejaJouees,lettresDecouvertes);
             }
             else {
                 if (VERBOSE) Console.WriteLine("l'humain joue un coup");
-                Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? ", j.nom);
+                Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
                 reponse = Console.ReadLine().ToUpper();
-                while (lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse)){
-                    if (!isChaineLegal(reponse))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
-                    else Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
+                while ((lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse) || reponse.Equals("2")) && !reponse.Equals("1") && !reponse.Equals("3")){
+                    if (!isChaineLegal(reponse) && !reponse.Equals("2"))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
+                    else if (lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
+                    else if (reponse.Equals("2")) {
+                        afficheRegles();
+                        Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
+                    }
                     reponse = Console.ReadLine().ToUpper();               
                 }
-                if (reponse.Length==1) lettresDejaJouees.Add(reponse) ;
+                if (reponse.Length==1 && !reponse.Equals("3")) lettresDejaJouees.Add(reponse) ;
             }
             return reponse;
         }
@@ -58,19 +73,72 @@ namespace Projet_pendu
             lettresDejaJouees.Add(reponse);
             return reponse;
         }
+      
+        public static string CoupIntelligent (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
+            List<char> lettresAbsentes = new List<char>();
+            List<string> motCompatibles = new List<string>();
+
+            foreach (string s in lettresDejaJouees)
+            {
+                if(!lettresDecouvertes.Contains(Char.Parse(s))) lettresAbsentes.Add(Char.Parse(s));
+            }
+
+            foreach(string mot in dictionnaire){
+                if (estCompatible(mot,lettresDecouvertes,lettresAbsentes)){
+                    motCompatibles.Add(mot);
+                }
+            }
+
+            if (motCompatibles.Count()==1) return motCompatibles[0];
+
+            Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>();
+            int prioriteMax=1;
+            char lettreLaPlusPrioritaire='?';
+
+            foreach(string mot in motCompatibles){
+                foreach (char lettre in mot)
+                {
+                    if (!lettresDecouvertes.Contains(lettre)){
+                        if (lettresPriorisees.ContainsKey(lettre)){
+                            lettresPriorisees[lettre]++;
+                            if (lettresPriorisees[lettre]>prioriteMax){
+                               prioriteMax=lettresPriorisees[lettre] ;
+                               lettreLaPlusPrioritaire=lettre;
+                            }
+                        }
+                        else {
+                            lettresPriorisees.Add(lettre,1);
+                            if (lettreLaPlusPrioritaire=='?') lettreLaPlusPrioritaire=lettre;
+                        }
+                    }
+
+                }
+            }
+            lettresDejaJouees.Add(lettreLaPlusPrioritaire.ToString());
+            return lettreLaPlusPrioritaire.ToString();
+        }
+
+
+        public static bool estCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
+            if (mot.Length != lettresDecouvertes.Length) return false;
+            for (int i=0; i<mot.Length;i++) {
+                if (lettresDecouvertes[i]!='_' && lettresDecouvertes[i]!=mot[i]) return false;
+                if (lettresAbsentes.Contains(mot[i])) return false;
+            }
+            return true;
+        }
+
+
+      
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
         public static bool isChaineLegal (string s){
-            string specialChar = @"\|!#$%&/()=?»«@£§€{}.;'<>_,àéèù";
-            foreach (var item in specialChar)
-            {
-                if (s.Contains(item))
-                {
-                    Console.Writeline("Erreur : La chaîne entrée est invalide (caractères spéciaux)");
-                    return false;
-                }
+            bool retour = true;
+            foreach (char lettre in s){
+                if ((int) lettre <65 || (int) lettre >90) retour = false;
             }
-            return true;
+    
+            return retour;
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
@@ -93,15 +161,15 @@ namespace Projet_pendu
             return true;
         }
 
-        public static void chargeDictionnaire (string adresse) {
-            dictionnaire = new List<string>();
+        public static void chargeFichier (string adresse, Fichier f) {
+            List<string> l = new List<string>();
             try 
             { 
                 System.Text.Encoding encoding = System.Text.Encoding.GetEncoding("iso-8859-1");
                 StreamReader monStreamReader = new StreamReader(adresse,encoding); 
                 string mot = monStreamReader.ReadLine(); 
                 while (mot != null) { 
-                    dictionnaire.Add(mot);
+                    l.Add(mot);
                     mot = monStreamReader.ReadLine();
                 } 
                 monStreamReader.Close(); 
@@ -111,38 +179,60 @@ namespace Projet_pendu
                 Console.Write("Une erreur est survenue au cours de la lecture :"); 
                 Console.WriteLine(ex.Message); 
             } 
+
+            switch (f){
+                case (Fichier.dictionnaire) :
+                dictionnaire = l;
+                break;
+                case (Fichier.regles) : 
+                regles = l;
+                break;
+                case(Fichier.dessin):
+                break;
+            }
+
+
+
+
         }
 
-        public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
-	        
-                //mot = new char[] {'C','H','A','T'};            
 
-				Random rndIndex = new Random();
-				if(j.robot == true){
-					indexDico = rndIndex(0, dictionnaire.Size());
-					mot = dictionnaire[indexDico];
-				}
-				else{
-                    while (!motAccepte) {
-                    bool motAccepte = false;
-                        while (reponse == '1')
-                        {
-                            Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
-                            string reponse = Console.ReadLine();
-                            if (reponse == '1') afficheListe();
-                            else mot = reponse;
-                        }
-                    
-                    if (dictionnaire.Contains(mot)) {
-                        if (isChaineLegal(mot) == true) {
-                            motAccepte = true; 
-                        }
+        public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
+	        int indexDico;
+            bool motAccepte =false;
+            string reponse="1";
+
+            //mot = new char[] {'C','H','A','T'};     
+            //lettresDecouvertes = new char [] { '_', '_', '_','_','_'};   
+ 
+			Random rndIndex = new Random();
+			if(j.robot == true){
+				indexDico = rndIndex.Next(0, dictionnaire.Count);
+				mot = dictionnaire[indexDico].ToCharArray();
+			}
+			else{
+                while (!motAccepte) {
+                    while (reponse.Equals("1")){
+                        reponse=""; // sinon boucle infini
+                        Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
+                        reponse = Console.ReadLine();
+                        if (reponse.Equals("1")) afficheListe(dictionnaire,100);
                     }
-                    else {
+                    
+                    motAccepte = dictionnaire.Contains(reponse) && isChaineLegal(reponse);
+                    if (!motAccepte) {
                         Console.WriteLine("Le mot est introuvable sur le dictionnaire. Veuillez réessayer.");
                     }
 				}
-				lettresDecouvertes = new char [] { '_', '_', '_'};
+                mot = reponse.ToCharArray();
+            }
+			lettresDecouvertes = new char [mot.Length] ;
+            for (int i = 0; i < mot.Length; i++)
+            {
+			    lettresDecouvertes[i] = '_';
+                if (mot[i]=='-')lettresDecouvertes[i] = '-';
+            }
+                 
         }
 
         public static void afficheTab (char[] tab){
@@ -154,6 +244,7 @@ namespace Projet_pendu
         }
 
         public static void afficheListe (List<string> l, int limite){
+            if (l.Count<limite) limite=l.Count;
             for (int i=0;i<limite;i++){
                 Console.Write(l[i]);
                 Console.Write(" ");
@@ -161,47 +252,53 @@ namespace Projet_pendu
             Console.WriteLine();
         }
 
+        public static void afficheRegles (){
+            foreach (string ligne in regles){
+                centrerLeTexte(ligne);
+            }
 
+        }
         public static void dessinePendu (int taille){
-            CentrerLeTexte(" _______");
-            CentrerLeTexte(" |/   | ");
+            Console.Clear();
+            centrerLeTexte(" _______");
+            centrerLeTexte(" |/   | ");
             switch (taille) {
             case 0 :
-                CentrerLeTexte(" |      ");
-                CentrerLeTexte(" |      ");
-                CentrerLeTexte(" |      ");
-                CentrerLeTexte(" |      ");
+                centrerLeTexte(" |      ");
+                centrerLeTexte(" |      ");
+                centrerLeTexte(" |      ");
                 break;
             case 1 :
-            CentrerLeTexte(" |    O ");
-            CentrerLeTexte(" |      ");
-            CentrerLeTexte(" |      ");
+            centrerLeTexte(" |    O ");
+            centrerLeTexte(" |      ");
+            centrerLeTexte(" |      ");
+            
             break;
             case 2 :
-            CentrerLeTexte(" |    O ");
-            CentrerLeTexte(" |   -| ");
-            CentrerLeTexte(" |      ");
+            centrerLeTexte(" |    O ");
+            centrerLeTexte(" |   -| ");
+            centrerLeTexte(" |      ");
             break;
             case 3 :
-            CentrerLeTexte(" |    O ");
-            CentrerLeTexte(" |   -|-");
-            CentrerLeTexte(" |      ");
+            centrerLeTexte(" |    O ");
+            centrerLeTexte(" |   -|-");
+            centrerLeTexte(" |      ");
             break;
             case 4 :
-            CentrerLeTexte(" |    O ");
-            CentrerLeTexte(" |   -|-");
-            CentrerLeTexte(" |    / ");
+            centrerLeTexte(" |    O ");
+            centrerLeTexte(" |   -|-");
+            centrerLeTexte(" |    / ");
             break;
             case 5 :
-            CentrerLeTexte(" |    O ");
-            CentrerLeTexte(" |   -|-");
-            CentrerLeTexte(" |    /\\");
+            centrerLeTexte(" |    O ");
+            centrerLeTexte(" |   -|-");
+            centrerLeTexte(" |    /\\");
             break;
             }
 
 
-
-            CentrerLeTexte("-----------");
+            centrerLeTexte(" |      ");
+            centrerLeTexte("-----------");
 
 
 
@@ -209,11 +306,15 @@ namespace Projet_pendu
             
         }
 
-        private static void CentrerLeTexte(string texte){
+        private static void centrerLeTexte(string texte){
             int nbEspaces = (Console.WindowWidth - texte.Length) / 2;
-            Console.SetCursorPosition(nbEspaces, Console.CursorTop);
+            if (nbEspaces>0) Console.SetCursorPosition(nbEspaces, Console.CursorTop);
             Console.WriteLine(texte);
         }
+
+      
+
+
 
         public static void demandeNom (ref string nom, string message){
             Console.WriteLine("Quelle est le nom {0} ?",message);
@@ -236,7 +337,8 @@ namespace Projet_pendu
             Joueur j2 = new Joueur();
             List<string> lettresDejaJouees = new List<string>();
 
-            chargeDictionnaire(ADRESSE_DICO);
+            chargeFichier(ADRESSE_DICO, Fichier.dictionnaire);
+            chargeFichier(ADRESSE_REGLES, Fichier.regles);
 
             Console.WriteLine("Vous désirez jouer avec : deux ordinateurs [1], deux humains [2], un ordinateur contre un humain [3] ?");
             while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 ||  choixModeJeu>3 ){
@@ -280,10 +382,12 @@ namespace Projet_pendu
                     afficheListe(lettresDejaJouees,27);
 
                     
-                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees);
-                    else                  coup=JoueCoup(j2,lettresDejaJouees);
+                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
+                    else                  coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
 
-                    if (coup.Length==1){
+                    if (coup.Equals("1")) perdu = true ;
+                    if (coup.Equals("3")) coup = CoupIntelligent(lettresDejaJouees, lettresDecouvertes) ;
+                    else if (coup.Length==1){
                         if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
                             taillePendu++;
                         }
