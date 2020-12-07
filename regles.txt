@@ -1,0 +1,15 @@
+Règles du jeu de Pendu
+Tentez de deviner le mot secret en entrant les lettres qui le composent une par une au clavier. Ne gaspillez pas vos coups, car si 5 de vos choix sont erronés vous tuerez le pendu et vous perdrez la partie.
+
+Le premier joueur choisit aléatoirement un mot dans un dictionnaire. Le joueur adverse cherche à le deviner, il peut pour cela effectuer un nombre fini de propositions de lettres ou de mots (5 maximum avant la défaite). Tant que les conditions de fin de partie ne sont pas satisfaites, le joueur peut faire une nouvelle proposition de lettre ou de mot. Une partie est terminée lorsque le mot a été trouvé ou que le joueur est pendu. 
+
+Une proposition de lettre ou de mot est​ erronée :
+-        lorsque la lettre proposée n'appartient pas au mot,
+-        ou lorsque la lettre a déjà été proposée,
+-        ou lorsque le mot proposé n'est pas égal au mot à trouver.
+
+Si la proposition est erronée, un morceau supplémentaire du corps du pendu est dessiné sous la potence. Le corps du pendu est constitué :
+-        d'une tête
+-        d'un tronc
+-        de deux bras (droit et gauche)
+-        de deux jambes (droite et gauche)
