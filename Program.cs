@@ -48,11 +48,13 @@ namespace Projet_pendu
                 if (VERBOSE) Console.WriteLine("l'humain joue un coup");
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
                 reponse = Console.ReadLine().ToUpper();
-                if (reponse.Equals("2")) afficheRegles();
                 while ((lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse) || reponse.Equals("2")) && !reponse.Equals("1") && !reponse.Equals("3")){
                     if (!isChaineLegal(reponse) && !reponse.Equals("2"))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
                     else if (lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
-                    else  Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
+                    else if (reponse.Equals("2")) {
+                        afficheRegles();
+                        Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
+                    }
                     reponse = Console.ReadLine().ToUpper();               
                 }
                 if (reponse.Length==1 && !reponse.Equals("3")) lettresDejaJouees.Add(reponse) ;
@@ -212,6 +214,7 @@ namespace Projet_pendu
 			else{
                 while (!motAccepte) {
                     while (reponse.Equals("1")){
+                        reponse=""; // sinon boucle infini
                         Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
                         reponse = Console.ReadLine();
                         if (reponse.Equals("1")) afficheListe(dictionnaire,100);
