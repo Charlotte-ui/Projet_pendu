@@ -34,7 +34,8 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-         public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
+         public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            
+             if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
             string reponse;
            // int
             if (j.robot){
@@ -48,13 +49,13 @@ namespace Projet_pendu
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
                 reponse = Console.ReadLine().ToUpper();
                 if (reponse.Equals("2")) afficheRegles();
-                while (lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse) || reponse.Equals(CoupSpeciaux.regles.ToString())){
-                    if (!isChaineLegal(reponse))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
+                while ((lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse) || reponse.Equals("2")) && !reponse.Equals("1") && !reponse.Equals("3")){
+                    if (!isChaineLegal(reponse) && !reponse.Equals("2"))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
                     else if (lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
                     else  Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
                     reponse = Console.ReadLine().ToUpper();               
                 }
-                if (reponse.Length==1) lettresDejaJouees.Add(reponse) ;
+                if (reponse.Length==1 && !reponse.Equals("3")) lettresDejaJouees.Add(reponse) ;
             }
             return reponse;
         }
@@ -131,7 +132,12 @@ namespace Projet_pendu
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
         public static bool isChaineLegal (string s){
-            return true;
+            bool retour = true;
+            foreach (char lettre in s){
+                if ((int) lettre <65 || (int) lettre >90) retour = false;
+            }
+    
+            return retour;
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
