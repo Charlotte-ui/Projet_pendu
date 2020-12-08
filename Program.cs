@@ -35,18 +35,13 @@ namespace Projet_pendu
         }
 
         // reste le test de si contient des caractères non autorisés
-        public static string JoueCoup (Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            
-             if (VERBOSE) Console.WriteLine("entrée dans JoueCoup");
+        public static string JoueCoup (ref Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes) {            
             string reponse;
-           // int
             if (j.robot){
-                if (VERBOSE) Console.WriteLine("le robot joue un coup");
-                Console.Write(j.nom);
                 //return CoupAleatoire (lettresDejaJouees);
                 return coupIntelligent(lettresDejaJouees,lettresDecouvertes);
             }
             else {
-                if (VERBOSE) Console.WriteLine("l'humain joue un coup");
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles, [3] pour recevoir une aide intelligente de l'ordinateur)", j.nom);
                 reponse = Console.ReadLine().ToUpper();
                 while ((lettresDejaJouees.Contains(reponse) || !isChaineLegal(reponse) || reponse.Equals("2")) && !reponse.Equals("1") && !reponse.Equals("3")){
@@ -194,14 +189,15 @@ namespace Projet_pendu
 
         }
 
-        public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
+        public static void choixMot (ref Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        int indexDico;
             bool motAccepte =false;
             string reponse="1";
 
             //mot = new char[] {'C','H','A','T'};     
             //lettresDecouvertes = new char [] { '_', '_', '_','_','_'};   
- 
+
+            Console.WriteLine("C'est à {0} de choisir le mot.",j.nom);
 			Random rndIndex = new Random();
 			if(j.robot == true){
 				indexDico = rndIndex.Next(0, dictionnaire.Count);
@@ -259,7 +255,7 @@ namespace Projet_pendu
             Console.WriteLine();
         }
         public static void dessinePendu (int taille){
-            Console.Clear();
+         //   Console.Clear();
             centrerLeTexte(" _______");
             centrerLeTexte(" |/   | ");
             switch (taille) {
@@ -316,7 +312,7 @@ namespace Projet_pendu
             nom= Console.ReadLine();
         }
 
-        public static void initialisationJoueur (Joueur j1, Joueur j2){
+        public static void initialisationJoueur (ref Joueur j1, ref Joueur j2){
             int choixModeJeu;
 
             if (j1.aInitialiser && j2.aInitialiser){
@@ -341,7 +337,7 @@ namespace Projet_pendu
                         j1.robot=true;
                     }
                     if (j2.aInitialiser) {
-                        j2.nom="HAL";
+                        j2.nom="Skynet";
                         j2.robot=true;
                     }
                 break;
@@ -374,11 +370,11 @@ namespace Projet_pendu
             j2.aInitialiser=false;
         }
 
-        public static void messageFin (Joueur j1, Joueur j2){
+        public static void messageFin (ref Joueur j1, ref Joueur j2){
             Console.WriteLine("Fin de partie \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
         }
 
-        public static void changementModeJeu (Joueur j1, Joueur j2){
+        public static void changementModeJeu (ref Joueur j1, ref Joueur j2){
             int choixModeJeu;
             Console.WriteLine("Voulez-vous changer le premier joueur [1], le second joueur [2], les deux [3] ?");
             while (!int.TryParse(Console.ReadLine(),out choixModeJeu)){
@@ -388,18 +384,18 @@ namespace Projet_pendu
                 Console.WriteLine("Aurevoir {0} ! Votre score état de {1}.",j1.nom,j1.nbVictoire);
                 j1.nbVictoire=0;
                 j1.aInitialiser=true;
-                initialisationJoueur (j1,j2);
+                initialisationJoueur (ref j1,ref j2);
             }
             if (choixModeJeu== 2) {
                 Console.WriteLine("Aurevoir {0} ! Votre score état de {1}.",j2.nom,j2.nbVictoire);
                 j2.aInitialiser=true;
-                initialisationJoueur (j1,j2);
+                initialisationJoueur (ref j1,ref j2);
             }
             if (choixModeJeu== 3) {
-                messageFin(j1,j2);
+                messageFin(ref j1,ref j2);
                 j1.aInitialiser=true;
                 j2.aInitialiser=true;
-                initialisationJoueur (j1,j2);
+                initialisationJoueur (ref j1,ref j2);
             }
         }
 
@@ -421,12 +417,12 @@ namespace Projet_pendu
             
             j1.aInitialiser=true;
             j2.aInitialiser=true;
-            initialisationJoueur (j1,j2);
+            initialisationJoueur (ref j1,ref j2);
 
             while (continuerAJouer){
                 // choix du mot à faire deviner
-                if (j1.role==CHOIX_MOT) choixMot(j1,out mot, out lettresDecouvertes);
-                else                    choixMot(j2,out mot, out lettresDecouvertes);
+                if (j1.role==CHOIX_MOT) choixMot(ref j1,out mot, out lettresDecouvertes);
+                else                    choixMot(ref j2,out mot, out lettresDecouvertes);
 
                 // l'autre joueur tente de deviner avec max 5 erreurs
                 while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
@@ -435,8 +431,8 @@ namespace Projet_pendu
                     Console.Write("Lettes déjà jouées : ");
                     afficheListe(lettresDejaJouees,27);
 
-                    if (j1.role==DEVINE)  coup=JoueCoup(j1,lettresDejaJouees,lettresDecouvertes);
-                    else                  coup=JoueCoup(j2,lettresDejaJouees,lettresDecouvertes);
+                    if (j1.role==DEVINE)  coup=JoueCoup(ref j1,lettresDejaJouees,lettresDecouvertes);
+                    else                  coup=JoueCoup(ref j2,lettresDejaJouees,lettresDecouvertes);
 
                     if (coup.Equals("1")) perdu = true ;
                     if (coup.Equals("3")) coup = coupIntelligent(lettresDejaJouees, lettresDecouvertes) ;
@@ -454,17 +450,17 @@ namespace Projet_pendu
                             perdu=true;
                         }
                     }
-
                     if (taillePendu==MAX_PENDU) perdu=true;                         
                 }
 
                 if (perdu){
                     dessinePendu(taillePendu);
-                    Console.WriteLine ("{0}, vous avez perdu ! le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
+                    Console.WriteLine ("{0}, vous avez perdu ! Le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
                     afficheTab(mot);
                 }
                 else {
-                    Console.WriteLine ("{0}, vous avez gagné !",(j1.role==DEVINE)?j1.nom:j2.nom);
+                    Console.WriteLine ("{0}, vous avez gagné ! Le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
+                    afficheTab(mot);
                     if (j1.role==DEVINE) j1.nbVictoire++;
                     else j2.nbVictoire++;
                 }
@@ -475,11 +471,15 @@ namespace Projet_pendu
                     Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
                 }
 
-                Console.WriteLine(" Voulez-vous changer de mode de jeu [true/false] ?");
-                while (!bool.TryParse(Console.ReadLine(),out changementModeJeu)){
-                    Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
+
+                if (continuerAJouer){
+                    Console.WriteLine(" Voulez-vous changer de mode de jeu [true/false] ?");
+                    while (!bool.TryParse(Console.ReadLine(),out changementModeJeu)){
+                        Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
+                    }
+                    if (changementModeJeu) Program.changementModeJeu (ref j1, ref j2);
                 }
-                if (changementModeJeu) Program.changementModeJeu ( j1,  j2);
+                
                 
 
                 j1.role=!j1.role;
@@ -492,7 +492,7 @@ namespace Projet_pendu
                 taillePendu=0;
             }
 
-            messageFin(j1,j2);
+            messageFin(ref j1,ref j2);
         }
     }
 }
