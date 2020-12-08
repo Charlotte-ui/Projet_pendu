@@ -16,6 +16,7 @@ namespace Projet_pendu
         public const string ADRESSE_REGLES = "regles.txt" ;
         public static List<string> dictionnaire;
         public static List<string> regles;
+        public static List<string> motsParTaille;
 
 
        public enum Fichier {
@@ -196,6 +197,17 @@ namespace Projet_pendu
 
         }
 
+
+	public static void ModuleLongueurDuMot(List <string> l, uint longueurMot, uint modeDeDifficulte, List<string> motsParTaille){
+		foreach (string s in l)
+            {
+				if(modeDeDifficulte < 3){
+					if(s.Length <= longueurMot) motsParTaille.Add(s);
+				}
+				else 
+					if(s.Length >= longueurMot) motsParTaille.Add(s);
+            }
+	}
 
         public static void choixMot (Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        int indexDico;
