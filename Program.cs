@@ -469,6 +469,18 @@ namespace Projet_pendu
             }
         }
 
+        public static void ModuleLongueurDuMot(List <string> l, uint longueurMot, uint modeDeDifficulte, List<string> motsParTaille){
+		foreach (string s in l)
+            {
+				if(modeDeDifficulte < 3){
+					if(s.Length <= longueurMot) motsParTaille.Add(s);
+				}
+				else 
+					if(s.Length >= longueurMot) motsParTaille.Add(s);
+            }
+	 
+        }
+
 
         static void Main(string[] args)
         {
