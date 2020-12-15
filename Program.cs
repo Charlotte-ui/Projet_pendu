@@ -520,6 +520,68 @@ namespace Projet_pendu
 	 
         }
 
+        	public static void ModuleLettreCommunesRares(uint modeDeDifficulte){
+	List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
+	List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
+	
+		foreach (String s in l)
+            {
+				if(modeDeDifficulte < 2){
+					int i = 0;
+					bool ceMotCorrespond = false;
+					while(i < s.Length-1 && !ceMotCorrespond){
+						for(int j = 0; j < lettresCommunes.Count; j++){		
+							if(s.Contains((string)lettresCommunes[j])){
+								motsParTaille.Add(s);
+								ceMotCorrespond = true;
+							}
+						}
+						i++;
+					}
+					ceMotCorrespond = false;
+				}
+				else {
+					if(modeDeDifficulte == 2){
+					int i = 0;
+					bool uneLettreCommune = false;
+					bool uneLettreRare = false;
+					while(i < s.Length-1 && (!uneLettreCommune && !uneLettreRare)){
+						for(int j = 0; j < lettresCommunes.Count; j++){		
+							if(s.Contains((string)lettresCommunes[j])){
+								uneLettreCommune = true;
+							}
+						}
+						if(uneLettreCommune){
+							for(int k = 0; k < lettresRares.Count; k++){		
+								if(s.Contains((string)lettresRares[k])){
+									motsParTaille.Add(s);
+									uneLettreRare = true;
+								}
+							}
+						}
+						i++;
+					}
+						uneLettreCommune = false;
+						uneLettreRare = false;
+					}
+					else{
+					int i = 0;
+					bool ceMotCorrespond = false;
+					while(i < s.Length-1 && !ceMotCorrespond){
+						for(int j = 0; j < lettresRares.Count; j++){		
+							if(s.Contains((string)lettresRares[j])){
+								motsParTaille.Add(s);
+								ceMotCorrespond = true;
+							}
+						}
+						i++;
+					}
+					ceMotCorrespond = false;
+				}
+            }
+		}
+	}
+
         public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees){
             dessinePendu(taillePendu);
             afficheTab(lettresDecouvertes);
