@@ -10,31 +10,33 @@ namespace Projet_pendu
 {
     class Program
     {
-        public const bool VERBOSE = false;
+
+        // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
         public const bool CHOIX_MOT = true;
         public const bool DEVINE = false;
-        public const int MAX_PENDU = 5 ;
-        public const int TEMPS_ATTENTE = 2000 ;
-        public const string ADRESSE_DICO = "dicoFR.txt" ;
-        public const string ADRESSE_REGLES = "regles.txt" ;
         public const string ABANDON = "1";
         public const string REGLES = "2";
         public const string AIDE = "3";
+
+        // Constantes numériques
+        public const int MAX_PENDU = 6 ;
+        public const int TEMPS_ATTENTE = 2000 ;
+
+        // Références d'adresses
+        public const string ADRESSE_DICO = "dicoFR.txt" ;
+        public const string ADRESSE_REGLES = "regles.txt" ;
+        public const string ADRESSE_NIVEAUX = "niveaux.txt" ;
+        public const string ADRESSE_DESSIN = "dessin.txt" ;
+        public const string ADRESSE_HEURISTIQUE = "heuristiques.txt" ;
+
+        // Dictionnaires
         public static List<string> dictionnaire;
         public static List<string> dictionnaireNiv0;
         public static List<string> dictionnaireNiv1;
         public static List<string> dictionnaireNiv2;
         public static List<string> dictionnaireNiv3;
         public static List<string> dictionnaireCourant;
-        public static List<string> regles;
-
-
-       public enum Fichier {
-            dictionnaire,
-            regles,
-            dessin
-        }
 
 
         public struct Joueur {
@@ -43,33 +45,34 @@ namespace Projet_pendu
             public int nbVictoire;
             public bool role ; //true choisit mot, false devine
             public bool aInitialiser ; // quand on change de mot de jeu
+            public int niv ; // niveau de difficulté pour le robot
         }
 
-        // reste le test de si contient des caractères non autorisés
         public static string JoueCoup (ref Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes, int niveau) {            
-            string reponse;
-            string aide="";
-            if (niveau<2) aide=", [3] pour recevoir une aide intelligente de l'ordinateur";
-            
+            string reponse="";
+            string aide=(niveau<2)?", [3] pour recevoir une aide intelligente de l'ordinateur":"";
             if (j.robot){
                 if (! SIMULATION) {
                     Console.WriteLine("C'est à {0} de deviner le mot.",j.nom);
                     Thread.Sleep(TEMPS_ATTENTE);
                 }
-             //   if (niveau<3) return CoupAleatoire (lettresDejaJouees);
-                if (j.nom.Equals("HAL")) return HeuristiqueMotCompatible(lettresDejaJouees,lettresDecouvertes, out List<string> motCompatibles);
-                else return HeuristiqueProbabiliste(lettresDejaJouees,dictionnaireCourant);
-             //   return HeuristiqueCombinee(lettresDejaJouees,lettresDecouvertes);
+
+                switch (j.niv) {
+                    case 1 : return CoupAleatoire (lettresDejaJouees);
+                    case 2 : return HeuristiqueMotCompatible(lettresDejaJouees,lettresDecouvertes, out List<string> motCompatibles);
+                    case 3 : return HeuristiqueProbabiliste(lettresDejaJouees,dictionnaireCourant);
+                    case 4 : return HeuristiqueCombinee(lettresDejaJouees,lettresDecouvertes);
+                }  
             }
             else {
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles {1}) ", j.nom,aide);
                 reponse = Console.ReadLine().ToUpper();
                
-                while (( (niveau<2 && lettresDejaJouees.Contains(reponse)) || !isChaineLegal(reponse) || reponse.Equals(REGLES)) && !reponse.Equals(ABANDON) && !(reponse.Equals(AIDE) && niveau<2)){
-                    if (!isChaineLegal(reponse) && !reponse.Equals(REGLES))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
-                    else if (niveau<2 && lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouez, choisissez en une autre.");
+                while (( (niveau<2 && lettresDejaJouees.Contains(reponse)) || !IsChaineLegal(reponse) || reponse.Equals(REGLES)) && !reponse.Equals(ABANDON) && !(reponse.Equals(AIDE) && niveau<2)){
+                    if (!IsChaineLegal(reponse) && !reponse.Equals(REGLES))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
+                    else if (niveau<2 && lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouée, choisissez en une autre.");
                     else if (reponse.Equals(REGLES)) {
-                        afficheRegles();
+                        AfficheRegles(ADRESSE_REGLES);
                         Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles {1})", j.nom,aide);
                     }
                     reponse = Console.ReadLine().ToUpper();    
@@ -126,7 +129,6 @@ namespace Projet_pendu
             return lettreLaPlusPrioritaire.ToString();
         }
 
-
         public static string HeuristiqueMotCompatible (List<string> lettresDejaJouees, char[] lettresDecouvertes, out List<string> motCompatibles){
             List<char> lettresAbsentes = new List<char>();
             motCompatibles = new List<string>();
@@ -138,7 +140,7 @@ namespace Projet_pendu
             }
 
             foreach(string mot in dictionnaireCourant){
-                if (estCompatible(mot,lettresDecouvertes,lettresAbsentes)){
+                if (IsCompatible(mot,lettresDecouvertes,lettresAbsentes)){
                     motCompatibles.Add(mot);
                     foreach (char lettre in mot) {
                         if (!lettresCompatibles.Contains(lettre)) lettresCompatibles.Add(lettre);
@@ -153,7 +155,7 @@ namespace Projet_pendu
             return i.ToString();
         }
 
-        private static bool estCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
+        private static bool IsCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
             if (mot.Length != lettresDecouvertes.Length) return false;
             for (int i=0; i<mot.Length;i++) {
                 if (lettresDecouvertes[i]!='_' && lettresDecouvertes[i]!=mot[i]) return false;
@@ -163,7 +165,7 @@ namespace Projet_pendu
         }
 
         // verifie que la chaine ne contient pas de caractères non autorisées (chiffres ...)
-        public static bool isChaineLegal (string s){
+        public static bool IsChaineLegal (string s){
             bool retour = true;
             foreach (char lettre in s){
                 if ((int) lettre <65 || (int) lettre >90) retour = false;
@@ -172,8 +174,7 @@ namespace Projet_pendu
             return retour;
         } 
 
-        public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
-            if (VERBOSE) Console.WriteLine("entrée dans isLettreDansMot");
+        public static bool IsLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
             bool res=false;
             for (int i=0; i<mot.Length;i++){
                 if (mot[i]==lettre) {
@@ -184,7 +185,7 @@ namespace Projet_pendu
             return res;
         }
 
-        public static bool deepEqualsTabChar (char[] tab1, char[] tab2) {
+        public static bool TestEgaliteTableau (char[] tab1, char[] tab2) {
             if (tab1.Length != tab2.Length ) return false;
             for (int i=0; i<tab1.Length;i++){
                 if (tab1[i]!=tab2[i]) return false;
@@ -192,7 +193,7 @@ namespace Projet_pendu
             return true;
         }
 
-        public static void chargeFichier (string adresse, Fichier f) {
+        public static List<string> ChargeFichier (string adresse) {
             List<string> l = new List<string>();
             try 
             { 
@@ -209,31 +210,14 @@ namespace Projet_pendu
             { 
                 Console.Write("Une erreur est survenue au cours de la lecture :"); 
                 Console.WriteLine(ex.Message); 
-            } 
-
-            switch (f){
-                case (Fichier.dictionnaire) :
-                dictionnaire = l;
-                break;
-                case (Fichier.regles) : 
-                regles = l;
-                break;
-                case(Fichier.dessin):
-                break;
             }
-
-
-
-
+            return l;
         }
 
-        public static void choixMot (ref Joueur j, out char[] mot, out char[] lettresDecouvertes){
+        public static void ChoixMot (ref Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        int indexDico;
             bool motAccepte =false;
             string reponse="1";
-
-            //mot = new char[] {'C','H','A','T'};     
-            //lettresDecouvertes = new char [] { '_', '_', '_','_','_'};   
 
             Console.WriteLine("C'est à {0} de choisir le mot.",j.nom);
 			Random rndIndex = new Random();
@@ -247,10 +231,10 @@ namespace Projet_pendu
                     while (reponse.Equals("1")){
                         Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste");
                         reponse = Console.ReadLine();
-                        if (reponse.Equals("1")) afficheDico(dictionnaireCourant,100);
+                        if (reponse.Equals("1")) AfficheDico(dictionnaireCourant,200);
                     }
                     reponse=reponse.ToUpper();
-                    motAccepte = dictionnaireCourant.Contains(reponse) && isChaineLegal(reponse);
+                    motAccepte = dictionnaireCourant.Contains(reponse) && IsChaineLegal(reponse);
                     if (!motAccepte) {
                         Console.WriteLine("Le mot est introuvable sur le dictionnaire. Veuillez réessayer.");
                         reponse = Console.ReadLine();
@@ -267,7 +251,7 @@ namespace Projet_pendu
                  
         }
 
-        public static void afficheTab (char[] tab){
+        public static void AfficheTab (char[] tab){
             foreach(char lettre in tab){
                 Console.Write(lettre);
                 if (lettre=='_') Console.Write(" ");
@@ -275,7 +259,7 @@ namespace Projet_pendu
             Console.WriteLine();
         }
 
-        public static void afficheListe (List<string> l, int limite, int deb){
+        public static void AfficheListe (List<string> l, int limite, int deb){
             if (l.Count<limite) limite=l.Count;
             if (deb<0) deb=0;
             for (;deb<limite;deb++){
@@ -285,90 +269,52 @@ namespace Projet_pendu
             Console.WriteLine();
         }
 
-        public static void afficheDico (List<string> l, int limite){
+        public static void AfficheDico (List<string> l, int limite){
             bool continu=true;
             int i=0;
             while (continu){
-                afficheListe (l, limite,i);
-                Console.WriteLine("Afficher les 100 mots suivants ? [true/false]");
+                AfficheListe (l, limite,i);
+                Console.WriteLine("Afficher les 200 mots suivants ? [true/false]");
                 while (!bool.TryParse(Console.ReadLine(),out continu)){
                     Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
                 }
-                i+=100;
-                limite+=100;
+                i+=200;
+                limite+=200;
             }
         }
 
-
-
-        public static void afficheRegles (){
+        public static void AfficheRegles (string adresse){
+            List<string> regles=ChargeFichier(adresse);
             Console.WriteLine();
-            centrerLeTexte("~ ~ ~");
+            CentrerLeTexte("~ ~ ~");
             foreach (string ligne in regles){
-                centrerLeTexte(ligne);
+                CentrerLeTexte(ligne);
             }
-            centrerLeTexte("~ ~ ~");
+            CentrerLeTexte("~ ~ ~");
             Console.WriteLine();
         }
-        public static void dessinePendu (int taille){
-         //   Console.Clear();
-            centrerLeTexte(" _______");
-            centrerLeTexte(" |/   | ");
-            switch (taille) {
-            case 0 :
-                centrerLeTexte(" |      ");
-                centrerLeTexte(" |      ");
-                centrerLeTexte(" |      ");
-                break;
-            case 1 :
-            centrerLeTexte(" |    O ");
-            centrerLeTexte(" |      ");
-            centrerLeTexte(" |      ");
-            
-            break;
-            case 2 :
-            centrerLeTexte(" |    O ");
-            centrerLeTexte(" |   -| ");
-            centrerLeTexte(" |      ");
-            break;
-            case 3 :
-            centrerLeTexte(" |    O ");
-            centrerLeTexte(" |   -|-");
-            centrerLeTexte(" |      ");
-            break;
-            case 4 :
-            centrerLeTexte(" |    O ");
-            centrerLeTexte(" |   -|-");
-            centrerLeTexte(" |    / ");
-            break;
-            case 5 :
-            centrerLeTexte(" |    O ");
-            centrerLeTexte(" |   -|-");
-            centrerLeTexte(" |    /\\");
-            break;
-            }
-
-
-            centrerLeTexte(" |      ");
-            centrerLeTexte("-----------");
-
-
-
-
-            
+        public static void DessinePendu (int taille, List<string> dessin){
+           // Console.Clear();
+            int i=0;
+            while (!dessin[i].Equals(taille.ToString())) i++;
+            for (int j=1 ; j<=7 ; j++ ) {
+                CentrerLeTexte(dessin[i+j]);
+            }       
         }
-        private static void centrerLeTexte(string texte){
+        private static void CentrerLeTexte(string texte){
             int nbEspaces = (Console.WindowWidth - texte.Length) / 2;
             if (nbEspaces>0) Console.SetCursorPosition(nbEspaces, Console.CursorTop);
             Console.WriteLine(texte);
         }
 
-        public static void demandeNom (ref string nom, string message){
+        public static void DemandeNom (ref string nom, string message){
             Console.WriteLine("Quelle est le nom {0} ?",message);
             nom= Console.ReadLine();
+            Console.WriteLine("Bienvenu {0} !",nom);
+
         }
 
-        public static void initialisationJoueur (ref Joueur j1, ref Joueur j2, ref int n){
+        public static void InitialisationJoueur (ref Joueur j1, ref Joueur j2, ref int n){
             int choixModeJeu;
 
             if (j1.aInitialiser && j2.aInitialiser){
@@ -385,7 +331,6 @@ namespace Projet_pendu
                 } 
             }
             
-
             switch (choixModeJeu) {
                 case 1:
                     if (j1.aInitialiser) {
@@ -398,22 +343,21 @@ namespace Projet_pendu
                     }
                 break;
                 case 2:
-                if (j1.aInitialiser) {
-                    demandeNom(ref j1.nom,"du premier joueur");
-                    j1.robot=false;
-                }
-                if (j2.aInitialiser) {
-                    demandeNom(ref j2.nom,"du second joueur");
-                    j2.robot=false;
-                }
+                    if (j1.aInitialiser) {
+                        DemandeNom(ref j1.nom,"du premier joueur");
+                        j1.robot=false;
+                    }
+                    if (j2.aInitialiser) {
+                        DemandeNom(ref j2.nom,"du second joueur");
+                        j2.robot=false;
+                    }
                 break;
                 case 3:
-                demandeNom(ref j1.nom,"du premier joueur");
-                j2.nom="Skynet";
-                j1.robot=false;
-                j2.robot=true;
+                    DemandeNom(ref j1.nom,"du premier joueur");
+                    j2.nom="Skynet";
+                    j1.robot=false;
+                    j2.robot=true;
                 break;
-
             }
             
             if (j1.aInitialiser && j2.aInitialiser){
@@ -421,19 +365,35 @@ namespace Projet_pendu
                 j2.role = !j1.role;
             }
             
-
             j1.aInitialiser=false;
             j2.aInitialiser=false;
 
             if (j1.robot && j2.robot){
-                Console.WriteLine("Les deux joueurs sont des robots. Voulez-vous lancer : [1] une démonstration (voir les deux robots s'affronter pas à pas) ou [2] une simulation (comparer les heuristiques sur n itérations du programmes) ?");
+                Console.WriteLine("Les deux joueurs sont des robots.");
+
+                Console.WriteLine("Choisissez une première heuristique pour {0}: aléatoire [1], par compatibilité de mots [2], par probabilité de lettres [3], les deux dernières combinées [4] (entrer [0] pour afficher le descriptif des heuristiques)",j1.nom);
+                    while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 || choixModeJeu>4 ){
+                        if (choixModeJeu==0) AfficheRegles(ADRESSE_HEURISTIQUE);
+                        else Console.WriteLine("Valeur erronée, veuillez entrer les chiffres 0,1,2,3 ou 4 uniquement.");
+                    }
+                j1.niv=choixModeJeu;
+
+                Console.WriteLine("Choisissez une seconde heuristique pour {0} :",j2.nom);
+                    while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 || choixModeJeu>4 ){
+                        if (choixModeJeu==0) AfficheRegles(ADRESSE_HEURISTIQUE);
+                        else Console.WriteLine("Valeur erronée, veuillez entrer les chiffres 0,1,2,3 ou 4 uniquement.");
+                    }
+                j2.niv=choixModeJeu;
+
+                Console.WriteLine("Voulez-vous lancer : [1] une démonstration (voir les deux robots s'affronter pas à pas) ou [2] une simulation (comparer les heuristiques sur n itérations du programmes) ?");
                 while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 ||  choixModeJeu>2 ){
                     Console.WriteLine("Valeur erronée, veuillez entrer un entier 1 ou 2 en fonction du mode de jeu désiré.");
                 }
+
                 if (choixModeJeu==2) {
                     SIMULATION=true;
-                    Console.WriteLine("Choisissez un nombre n d'itérations du programmes) ?");
-                    while (!int.TryParse(Console.ReadLine(),out n) ||  choixModeJeu<1 ){
+                    Console.WriteLine("Choisissez un nombre n d'itérations du programmes :");
+                    while (!int.TryParse(Console.ReadLine(),out n) ||  n<1 ){
                         Console.WriteLine("Valeur erronée, veuillez entrer un entier supérieur à 0.");
                     }
                 }
@@ -442,7 +402,9 @@ namespace Projet_pendu
             else SIMULATION=false;
         }
 
-        public static void initialisationDictionnaires (){
+        public static void InitialisationDictionnaires (){
+            dictionnaire=ChargeFichier(ADRESSE_DICO);
+            
             dictionnaireNiv0= new List<string>();
             dictionnaireNiv1= new List<string>();
             dictionnaireNiv2= new List<string>();
@@ -454,16 +416,19 @@ namespace Projet_pendu
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
         }
 
-        public static void Score (ref Joueur j1, ref Joueur j2){
-            Console.WriteLine("Fin de partie \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
+        public static void Score (Joueur j1, Joueur j2){
+            Console.WriteLine("Fin de partie : \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
         }
 
-        public static void ChoixNiveau(ref int niv){
-             
+        public static void ChoixNiveau(ref int niv, ref Joueur j1, ref Joueur j2){
+            
             Console.WriteLine("Choississez un niveau de difficulté [0,1,2,3]. Entrer -1 pour afficher le descriptifs des niveaux");
             while (!int.TryParse(Console.ReadLine(),out niv) || !(niv==0 || niv==1 || niv==2 || niv==3)){
                 if (niv != -1) Console.WriteLine("Valeur erronée, veuillez entrer 1,2,3 ou -1.");
-                else Console.WriteLine("blabla");
+                else {
+                    AfficheRegles(ADRESSE_NIVEAUX);
+                    Console.WriteLine("Choississez un niveau de difficulté [0,1,2,3].");
+                }
             }
 
             switch (niv){
@@ -481,9 +446,14 @@ namespace Projet_pendu
                 break;
             }
 
+            if (!(j1.robot && j2.robot)) {
+                j1.niv=niv;
+                j2.niv=niv;
+            }
+
         }
 
-        public static void changementModeJeu (ref Joueur j1, ref Joueur j2, ref int n){
+        public static void ChangementModeJeu (ref Joueur j1, ref Joueur j2, ref int n){
             int choixModeJeu;
             Console.WriteLine("Voulez-vous changer le premier joueur [1], le second joueur [2], les deux [3] ?");
             while (!int.TryParse(Console.ReadLine(),out choixModeJeu)){
@@ -493,18 +463,18 @@ namespace Projet_pendu
                 Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j1.nom,j1.nbVictoire);
                 j1.nbVictoire=0;
                 j1.aInitialiser=true;
-                initialisationJoueur (ref j1,ref j2, ref n);
+                InitialisationJoueur (ref j1,ref j2, ref n);
             }
             if (choixModeJeu== 2) {
                 Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j2.nom,j2.nbVictoire);
                 j2.aInitialiser=true;
-                initialisationJoueur (ref j1,ref j2, ref n);
+                InitialisationJoueur (ref j1,ref j2, ref n);
             }
             if (choixModeJeu== 3) {
-                Score(ref j1,ref j2);
+                Score( j1, j2);
                 j1.aInitialiser=true;
                 j2.aInitialiser=true;
-                initialisationJoueur (ref j1,ref j2, ref n);
+                InitialisationJoueur (ref j1,ref j2, ref n);
             }
         }
 
@@ -520,24 +490,31 @@ namespace Projet_pendu
 	 
         }
 
-        public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees){
-            dessinePendu(taillePendu);
-            afficheTab(lettresDecouvertes);
+        public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees, List<string> dessin){
+            DessinePendu(taillePendu,dessin);
+            AfficheTab(lettresDecouvertes);
             Console.Write("\nLettres déjà jouées : ");
-            afficheListe(lettresDejaJouees,27,0);
+            AfficheListe(lettresDejaJouees,27,0);
         }
 
+        public static void InitialisationProgramme (ref Joueur j1,ref Joueur j2, ref int niveau, ref int n){
+            j1.aInitialiser=true;
+            j2.aInitialiser=true;
+            InitialisationJoueur (ref j1,ref j2, ref n);
+            InitialisationDictionnaires ();
+            ChoixNiveau(ref niveau, ref j1, ref j2);
+        }
 
-        public static void MessageDeFin (bool perdu, int taillePendu, char[] mot, ref Joueur j1, ref Joueur j2, ref bool continuerAJouer, ref int niveau, ref int n){
+        public static void MessageDeFin (bool perdu, int taillePendu, char[] mot, ref Joueur j1, ref Joueur j2, ref bool continuerAJouer, ref int niveau, ref int n, List<string> dessin){
             bool changement;
             if (perdu){
-                    dessinePendu(taillePendu);
+                    DessinePendu(taillePendu,dessin);
                     Console.WriteLine ("{0}, vous avez perdu ! Le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
-                    afficheTab(mot);
+                    AfficheTab(mot);
                 }
                 else {
                     Console.WriteLine ("{0}, vous avez gagné ! Le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
-                    afficheTab(mot);
+                    AfficheTab(mot);
                     if (j1.role==DEVINE) j1.nbVictoire++;
                     else j2.nbVictoire++;
                 }
@@ -554,14 +531,14 @@ namespace Projet_pendu
                     while (!bool.TryParse(Console.ReadLine(),out changement)){
                         Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
                     }
-                    if (changement) changementModeJeu (ref j1, ref j2, ref n);
+                    if (changement) ChangementModeJeu (ref j1, ref j2, ref n);
 
 
                     Console.WriteLine("Voulez-vous changer de niveau [true/false] ?");
                     while (!bool.TryParse(Console.ReadLine(),out changement)){
                         Console.WriteLine("Valeur erronée, veuillez entrer \"true\" ou \"false\".");
                     }
-                    if (changement) ChoixNiveau(ref niveau);
+                    if (changement) ChoixNiveau(ref niveau, ref j1, ref j2);
                 }
 
         }
@@ -579,37 +556,31 @@ namespace Projet_pendu
             Joueur j1 = new Joueur();
             Joueur j2 = new Joueur();
             List<string> lettresDejaJouees = new List<string>();
-
-            chargeFichier(ADRESSE_DICO, Fichier.dictionnaire);
-            chargeFichier(ADRESSE_REGLES, Fichier.regles);
-
+            List<string> dessin = ChargeFichier(ADRESSE_DESSIN);
             
-            j1.aInitialiser=true;
-            j2.aInitialiser=true;
-            initialisationJoueur (ref j1,ref j2, ref n);
-            initialisationDictionnaires ();
-
-            ChoixNiveau(ref niveau);
+            InitialisationProgramme (ref j1,ref j2,ref niveau, ref n);
+            
+           
 
             while ((continuerAJouer && !SIMULATION) || (SIMULATION && nbIteration<n)){
                 Console.Clear();
                 // choix du mot à faire deviner
-                if (j1.role==CHOIX_MOT) choixMot(ref j1,out mot, out lettresDecouvertes);
-                else                    choixMot(ref j2,out mot, out lettresDecouvertes);
+                if (j1.role==CHOIX_MOT) ChoixMot(ref j1,out mot, out lettresDecouvertes);
+                else                    ChoixMot(ref j2,out mot, out lettresDecouvertes);
 
-                // l'autre joueur tente de deviner avec max 5 erreurs
-                while (!(perdu || deepEqualsTabChar(mot,lettresDecouvertes))){
+                // l'autre joueur tente de deviner avec max 6 erreurs
+                while (!(perdu || TestEgaliteTableau(mot,lettresDecouvertes))){
                  
-                    if (!SIMULATION)  AfficheInfo ( taillePendu, lettresDecouvertes, lettresDejaJouees);
+                    if (!SIMULATION)  AfficheInfo ( taillePendu, lettresDecouvertes, lettresDejaJouees,dessin);
 
                     if (j1.role==DEVINE)  {
                         coup=JoueCoup(ref j1,lettresDejaJouees,lettresDecouvertes, niveau);
-                        if (!SIMULATION && j1.robot) Console.WriteLine("{0} joue le coup \"{0}\"",j1.nom,coup);
+                        if (!SIMULATION && j1.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j1.nom,coup);
 
                     }
                     else {
                         coup=JoueCoup(ref j2,lettresDejaJouees,lettresDecouvertes, niveau);
-                        if (!SIMULATION && j1.robot) Console.WriteLine("{0} joue le coup \"{0}\"",j1.nom,coup);
+                        if (!SIMULATION && j2.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j2.nom,coup);
                     }
 
                     if (coup.Equals(ABANDON)) perdu = true ;
@@ -621,12 +592,12 @@ namespace Projet_pendu
                     }
                     
                     else if (coup.Length==1){
-                        if (!isLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
+                        if (!IsLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)){
                             taillePendu++;
                         }
                     }
                     else {
-                        if (deepEqualsTabChar(coup.ToCharArray(),mot)){
+                        if (TestEgaliteTableau(coup.ToCharArray(),mot)){
                             lettresDecouvertes=mot;
                         }
                         else {
@@ -636,7 +607,7 @@ namespace Projet_pendu
                     if (taillePendu==MAX_PENDU) perdu=true;                         
                 }
                 
-                if (!SIMULATION) MessageDeFin ( perdu,  taillePendu,  mot, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n);                
+                if (!SIMULATION) MessageDeFin ( perdu,  taillePendu,  mot, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n,dessin);                
                 else if (!perdu){
                     if (j1.role==DEVINE) j1.nbVictoire++;
                     else j2.nbVictoire++;
@@ -653,7 +624,7 @@ namespace Projet_pendu
                 nbIteration++;
             }
 
-            Score(ref j1,ref j2);
+            Score( j1, j2);
         }
     }
 }

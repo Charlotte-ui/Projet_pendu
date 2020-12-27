@@ -1,0 +1,5 @@
+Descriptifs des heuristiques
+Aléatoire : l'ordinateur choisit une lettre aléatoirement dans l'alphabet, sauf s'il elle a déjà été jouée précédement.
+Par compatibilité de mot : l'ordinateur choisit une lettre aléatoirement parmis celles qui composent les mots compatibles avec les lettres déjà jouées (c'est à dire qui comporte les lettres déjà validées aux bons endroits et qui ne comporte pas les lettres rejettées).
+Par probabilité de lettres : l'ordinateur choisit la lettre qui est présente le plus souvent dans le dictionnaire.
+Combinée : l'ordinateur choisit la lettre qui est présente le plus souvent dans les mots compatibles.
