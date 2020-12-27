@@ -173,7 +173,6 @@ namespace Projet_pendu
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
-            if (VERBOSE) Console.WriteLine("entrée dans isLettreDansMot");
             bool res=false;
             for (int i=0; i<mot.Length;i++){
                 if (mot[i]==lettre) {
@@ -449,9 +448,13 @@ namespace Projet_pendu
             dictionnaireNiv3= new List<string>();
 
             ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
+            ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
             ModuleLongueurDuMot(dictionnaire,7,1,dictionnaireNiv1);
+            ModuleLettreCommunesRares(dictionnaire,1,dictionnaireNiv1);
             ModuleLongueurDuMot(dictionnaire,9,2,dictionnaireNiv2);
+            ModuleLettreCommunesRares(dictionnaire,2,dictionnaireNiv2);
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
+            ModuleLettreCommunesRares(dictionnaire,3,dictionnaireNiv3);
         }
 
         public static void Score (ref Joueur j1, ref Joueur j2){
@@ -518,6 +521,68 @@ namespace Projet_pendu
 					if(s.Length >= longueurMot) motsParTaille.Add(s);
             }
 	 
+        }
+
+        public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParRareteCommune){
+        List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
+        List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
+        
+            foreach (String s in l)
+                {
+                    if(modeDeDifficulte < 2){
+                        int i = 0;
+                        bool ceMotCorrespond = false;
+                        while(i < s.Length-1 && !ceMotCorrespond){
+                            for(int j = 0; j < lettresCommunes.Count; j++){		
+                                if(s.Contains((string)lettresCommunes[j])){
+                                    motsParRareteCommune.Add(s);
+                                    ceMotCorrespond = true;
+                                }
+                            }
+                            i++;
+                        }
+                        ceMotCorrespond = false;
+                    }
+                    else {
+                        if(modeDeDifficulte == 2){
+                        int i = 0;
+                        bool uneLettreCommune = false;
+                        bool uneLettreRare = false;
+                        while(i < s.Length-1 && (!uneLettreCommune && !uneLettreRare)){
+                            for(int j = 0; j < lettresCommunes.Count; j++){		
+                                if(s.Contains((string)lettresCommunes[j])){
+                                    uneLettreCommune = true;
+                                }
+                            }
+                            if(uneLettreCommune){
+                                for(int k = 0; k < lettresRares.Count; k++){		
+                                    if(s.Contains((string)lettresRares[k])){
+                                        motsParRareteCommune.Add(s);
+                                        uneLettreRare = true;
+                                    }
+                                }
+                            }
+                            i++;
+                        }
+                            uneLettreCommune = false;
+                            uneLettreRare = false;
+                        }
+                        else{
+                        int i = 0;
+                        bool ceMotCorrespond = false;
+                        while(i < s.Length-1 && !ceMotCorrespond){
+                            for(int j = 0; j < lettresRares.Count; j++){		
+                                if(s.Contains((string)lettresRares[j])){
+                                    motsParRareteCommune.Add(s);
+                                    ceMotCorrespond = true;
+                                }
+                            }
+                            i++;
+                        }
+                        ceMotCorrespond = false;
+                    }
+                }
+            }
         }
 
         public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees){
