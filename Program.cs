@@ -5,13 +5,13 @@ using System.IO ;
 using System.Linq;
 using System.Collections;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
     class Program
-    {
-        public const bool VERBOSE = false;
-        static bool SIMULATION = false;
+    {   static bool SIMULATION = false;
         public const bool CHOIX_MOT = true;
         public const bool DEVINE = false;
         public const int MAX_PENDU = 5 ;
@@ -173,7 +173,7 @@ namespace Projet_pendu
         } 
 
         public static bool isLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
-            if (VERBOSE) Console.WriteLine("entrée dans isLettreDansMot");
+            
             bool res=false;
             for (int i=0; i<mot.Length;i++){
                 if (mot[i]==lettre) {
@@ -449,9 +449,13 @@ namespace Projet_pendu
             dictionnaireNiv3= new List<string>();
 
             ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
+            ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
             ModuleLongueurDuMot(dictionnaire,7,1,dictionnaireNiv1);
+            ModuleLettreCommunesRares(dictionnaire,1,dictionnaireNiv1);
             ModuleLongueurDuMot(dictionnaire,9,2,dictionnaireNiv2);
+            ModuleLettreCommunesRares(dictionnaire,2,dictionnaireNiv2);
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
+            ModuleLettreCommunesRares(dictionnaire,3,dictionnaireNiv3);
         }
 
         public static void Score (ref Joueur j1, ref Joueur j2){
@@ -520,9 +524,9 @@ namespace Projet_pendu
 	 
         }
 
-        	public static void ModuleLettreCommunesRares(uint modeDeDifficulte){
-	List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
-	List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
+        public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParCommunRarete){
+        List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
+        List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
 	
 		foreach (String s in l)
             {
@@ -532,7 +536,7 @@ namespace Projet_pendu
 					while(i < s.Length-1 && !ceMotCorrespond){
 						for(int j = 0; j < lettresCommunes.Count; j++){		
 							if(s.Contains((string)lettresCommunes[j])){
-								motsParTaille.Add(s);
+								motsParCommunRarete.Add(s);
 								ceMotCorrespond = true;
 							}
 						}
@@ -554,7 +558,7 @@ namespace Projet_pendu
 						if(uneLettreCommune){
 							for(int k = 0; k < lettresRares.Count; k++){		
 								if(s.Contains((string)lettresRares[k])){
-									motsParTaille.Add(s);
+									motsParCommunRarete.Add(s);
 									uneLettreRare = true;
 								}
 							}
@@ -570,7 +574,7 @@ namespace Projet_pendu
 					while(i < s.Length-1 && !ceMotCorrespond){
 						for(int j = 0; j < lettresRares.Count; j++){		
 							if(s.Contains((string)lettresRares[j])){
-								motsParTaille.Add(s);
+								motsParCommunRarete.Add(s);
 								ceMotCorrespond = true;
 							}
 						}
@@ -581,6 +585,55 @@ namespace Projet_pendu
             }
 		}
 	}
+
+    public static void ModuleRepetitionLettre(List <string> l, uint modeDeDifficulte, List<string> motsParRepetOuNon){ 
+     
+        foreach (String s in l){ 
+            bool lettreRepetee = false;
+            if(modeDeDifficulte <= 1){
+                var vSorted = from letterOfS in s
+                     orderby letterOfS
+                     select letterOfS;
+                         
+                int i = 0;
+                string cSorted = vSorted.ToString();
+                char lettreActuelle = ' ';
+                char lettreSuivante = ' ';
+
+                while(!lettreRepetee && i < s.Length-1){
+                    
+                    lettreActuelle = cSorted[i];
+                    lettreSuivante = cSorted[i+1];  
+
+                    if(lettreActuelle == lettreSuivante){
+                        motsParRepetOuNon.Add(s);
+                        lettreRepetee = true;
+                    }
+                    i++;
+                }
+            }
+            else{
+                var vSorted = from letterOfS in s
+                     orderby letterOfS
+                     select letterOfS;
+                         
+                int i = 0;
+                string cSorted = vSorted.ToString();
+                char lettreActuelle = ' ';
+                char lettreSuivante = ' ';
+
+                while(!lettreRepetee && i < s.Length-1){
+                    
+                    lettreActuelle = cSorted[i];
+                    lettreSuivante = cSorted[i+1];  
+
+                    if(lettreActuelle == lettreSuivante) lettreRepetee = true;
+                    i++;
+                }
+                if(!lettreRepetee) motsParRepetOuNon.Add(s);
+            }
+        }
+    }
 
         public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees){
             dessinePendu(taillePendu);
