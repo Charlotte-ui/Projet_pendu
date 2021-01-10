@@ -4,12 +4,12 @@ using System.IO ;
 using System.Linq;
 using System.Collections;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
     class Program
-    {
-
         // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
         public const bool CHOIX_MOT = true;
@@ -221,6 +221,7 @@ namespace Projet_pendu
             char c = lettresCompatibles[i];
             return c.ToString();
         }
+
        
         /// <summary>
         /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différement en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvrtes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
@@ -562,10 +563,15 @@ namespace Projet_pendu
             dictionnaireNiv2= new List<string>();
             dictionnaireNiv3= new List<string>();
 
-            ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0); // application du module longueur du mot
+            ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
+            ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
+
             ModuleLongueurDuMot(dictionnaire,7,1,dictionnaireNiv1);
+            ModuleLettreCommunesRares(dictionnaire,1,dictionnaireNiv1);
             ModuleLongueurDuMot(dictionnaire,9,2,dictionnaireNiv2);
+            ModuleLettreCommunesRares(dictionnaire,2,dictionnaireNiv2);
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
+            ModuleLettreCommunesRares(dictionnaire,3,dictionnaireNiv3);
         }
 
         /// <summary>
@@ -764,6 +770,7 @@ namespace Projet_pendu
                 }
                 if(!lettreRepetee) motsParRepetOuNon.Add(s);
             }
+
         }
     }
 
