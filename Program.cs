@@ -9,8 +9,10 @@ using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
-    class Program
-    {
+    class Program    
+		{
+
+
         // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
         public const bool CHOIX_MOT = true;
@@ -564,6 +566,9 @@ namespace Projet_pendu
             dictionnaireNiv2= new List<string>();
             dictionnaireNiv3= new List<string>();
 
+
+            ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0); // application du module longueur du mot
+
             ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
             ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
 
@@ -662,6 +667,9 @@ namespace Projet_pendu
 					if(s.Length >= longueurMot) motsParTaille.Add(s);
             }
         }
+
+
+       
 
         public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParCommunRarete){
         List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
@@ -771,7 +779,6 @@ namespace Projet_pendu
                 }
                 if(!lettreRepetee) motsParRepetOuNon.Add(s);
             }
-
         }
     }
 
