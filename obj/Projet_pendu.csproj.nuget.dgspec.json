@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "/home/chacha/GitHub/Projet_pendu/Projet_pendu.csproj": {}
+    "c:\\Users\\apinzi\\Documents\\GitHub\\Projet_pendu\\Projet_pendu.csproj": {}
   },
   "projects": {
-    "/home/chacha/GitHub/Projet_pendu/Projet_pendu.csproj": {
+    "c:\\Users\\apinzi\\Documents\\GitHub\\Projet_pendu\\Projet_pendu.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/chacha/GitHub/Projet_pendu/Projet_pendu.csproj",
+        "projectUniqueName": "c:\\Users\\apinzi\\Documents\\GitHub\\Projet_pendu\\Projet_pendu.csproj",
         "projectName": "Projet_pendu",
-        "projectPath": "/home/chacha/GitHub/Projet_pendu/Projet_pendu.csproj",
-        "packagesPath": "/home/chacha/.nuget/packages/",
-        "outputPath": "/home/chacha/GitHub/Projet_pendu/obj/",
+        "projectPath": "c:\\Users\\apinzi\\Documents\\GitHub\\Projet_pendu\\Projet_pendu.csproj",
+        "packagesPath": "C:\\Users\\apinzi\\.nuget\\packages\\",
+        "outputPath": "c:\\Users\\apinzi\\Documents\\GitHub\\Projet_pendu\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "/home/chacha/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\apinzi\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -50,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.404/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.404\\RuntimeIdentifierGraph.json"
         }
       }
     }

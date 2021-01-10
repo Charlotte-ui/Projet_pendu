@@ -1,17 +1,15 @@
+
 using System;
 using System.Collections.Generic;
 using System.IO ;
 using System.Linq;
 using System.Collections;
 using System.Threading;
-using System.Text.RegularExpressions;
-using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
-    class Program    
-		{
-
+    class Program
+    {
 
         // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
@@ -224,7 +222,6 @@ namespace Projet_pendu
             char c = lettresCompatibles[i];
             return c.ToString();
         }
-
        
         /// <summary>
         /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différement en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvrtes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
@@ -566,18 +563,18 @@ namespace Projet_pendu
             dictionnaireNiv2= new List<string>();
             dictionnaireNiv3= new List<string>();
 
-
             ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0); // application du module longueur du mot
-
-            ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
             ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
-
+            ModuleRepetitionLettre(dictionnaire,0,dictionnaireNiv0);
             ModuleLongueurDuMot(dictionnaire,7,1,dictionnaireNiv1);
             ModuleLettreCommunesRares(dictionnaire,1,dictionnaireNiv1);
+            ModuleRepetitionLettre(dictionnaire,1,dictionnaireNiv1);
             ModuleLongueurDuMot(dictionnaire,9,2,dictionnaireNiv2);
             ModuleLettreCommunesRares(dictionnaire,2,dictionnaireNiv2);
+            ModuleRepetitionLettre(dictionnaire,2,dictionnaireNiv2);
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
             ModuleLettreCommunesRares(dictionnaire,3,dictionnaireNiv3);
+            ModuleRepetitionLettre(dictionnaire,3,dictionnaireNiv3);
         }
 
         /// <summary>
@@ -668,9 +665,6 @@ namespace Projet_pendu
             }
         }
 
-
-       
-
         public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParCommunRarete){
         List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
         List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
@@ -683,7 +677,7 @@ namespace Projet_pendu
 					while(i < s.Length-1 && !ceMotCorrespond){
 						for(int j = 0; j < lettresCommunes.Count; j++){		
 							if(s.Contains((string)lettresCommunes[j])){
-								motsParCommunRarete.Add(s);
+								if(!motsParCommunRarete.Contains(s)) motsParCommunRarete.Add(s);
 								ceMotCorrespond = true;
 							}
 						}
@@ -705,7 +699,7 @@ namespace Projet_pendu
 						if(uneLettreCommune){
 							for(int k = 0; k < lettresRares.Count; k++){		
 								if(s.Contains((string)lettresRares[k])){
-									motsParCommunRarete.Add(s);
+									if(!motsParCommunRarete.Contains(s)) motsParCommunRarete.Add(s);
 									uneLettreRare = true;
 								}
 							}
@@ -721,7 +715,7 @@ namespace Projet_pendu
 					while(i < s.Length-1 && !ceMotCorrespond){
 						for(int j = 0; j < lettresRares.Count; j++){		
 							if(s.Contains((string)lettresRares[j])){
-								motsParCommunRarete.Add(s);
+								if(!motsParCommunRarete.Contains(s)) motsParCommunRarete.Add(s);
 								ceMotCorrespond = true;
 							}
 						}
@@ -753,7 +747,7 @@ namespace Projet_pendu
                     lettreSuivante = cSorted[i+1];  
 
                     if(lettreActuelle == lettreSuivante){
-                        motsParRepetOuNon.Add(s);
+                        if(!motsParRepetOuNon.Contains(s)) motsParRepetOuNon.Add(s);
                         lettreRepetee = true;
                     }
                     i++;
@@ -777,7 +771,7 @@ namespace Projet_pendu
                     if(lettreActuelle == lettreSuivante) lettreRepetee = true;
                     i++;
                 }
-                if(!lettreRepetee) motsParRepetOuNon.Add(s);
+                if(!lettreRepetee) if(!motsParRepetOuNon.Contains(s)) motsParRepetOuNon.Add(s);
             }
         }
     }
