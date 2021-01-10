@@ -12,6 +12,7 @@ namespace Projet_pendu
     class Program    
 		{
 
+
         // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
         public const bool CHOIX_MOT = true;
