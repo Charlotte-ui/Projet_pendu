@@ -2,45 +2,181 @@ using System;
 using System.Collections.Generic;
 using System.IO ;
 using System.Linq;
-using System.Collections;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
-    class Program    
-		{
-
+    /// <summary>
+    /// La classe contenant le programme du jeu de pendu.
+    /// Le jeu se joue en monde console avec une approche procédurale.
+    /// </summary>
+    /// <remarks>
+    /// Trois types de mode de jeu existe : humain contre humain, humain contre ordinateur, ordinateur contre ordinateur
+    /// 4 niveaux de difficultés sont disponibles
+    /// l'IA de l'ordinateur dispose de 3 heuristiques de choix + un mode aléatoire
+    /// Dans le mode de jeu ordinateur contre ordinateur, deux alternatives sont possibles : démonstration (voir le programme se dérouller) ou simulation (comparer l'efficacité des heuristiques sur n itérations)
+    /// </remarks>
+    class Program
+    {
 
         // Constantes de nomenclature, utiles pour la lisibilité du programme
-        static bool SIMULATION = false;
+        /// <summary>
+        /// indique si le jeu est en mode simulation
+        /// </summary>
+        /// <value>
+        /// true ou false
+        /// </value>
+        static bool isSIMULATION = false;
+
+        /// <summary>
+        /// rend plus lisible le rôle du joueur (choisir le mot ou le deviner)
+        /// </summary>
+        /// <value>
+        /// true
+        /// </value>
         public const bool CHOIX_MOT = true;
+        
+        /// <summary>
+        /// rend plus lisible le rôle du joueur (choisir le mot ou le deviner)
+        /// </summary>
+        /// <value>
+        /// false
+        /// </value>
         public const bool DEVINE = false;
+        
+        /// <summary>
+        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// </summary>
+        /// <value>
+        /// "1""
+        /// </value>
         public const string ABANDON = "1";
+        
+        /// <summary>
+        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// </summary>
+        /// <value>
+        /// "2"
+        /// </value>
         public const string REGLES = "2";
+        
+        /// <summary>
+        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// </summary>
+        /// <value>
+        /// "3"
+        /// </value>
         public const string AIDE = "3";
 
         // Constantes numériques
+        
+        /// <summary>
+        /// nombre maximum d'étapes avant la fin du pendu, aka nombre d'erreure pour échouer
+        /// </summary>
+        /// <value>
+        /// 6
+        /// </value>
         public const int MAX_PENDU = 6 ;
+        
+        /// <summary>
+        /// temps d'attente, en ms, après chacunne des actions de l'ordinateur, pour que l'humain ait le temps de les lire
+        /// </summary>
+        /// <value>
+        /// 2000
+        /// </value>
         public const int TEMPS_ATTENTE = 2000 ;
 
         // Références d'adresses
+        
+        /// <summary>
+        /// adresse du dictionnaire principal
+        /// </summary>
+        /// <value>
+        /// dicoFR.txt
+        /// </value>
         public const string ADRESSE_DICO = "dicoFR.txt" ;
+        
+        /// <summary>
+        /// adresse du descriptif des régles
+        /// </summary>
+        /// <value>
+        /// regles.txt
+        /// </value>
         public const string ADRESSE_REGLES = "regles.txt" ;
+        
+        /// <summary>
+        /// adresse du descriptif des niveaux
+        /// </summary>
+        /// <value>
+        /// niveaux.txt
+        /// </value>
         public const string ADRESSE_NIVEAUX = "niveaux.txt" ;
+        
+        /// <summary>
+        /// adresse du dessin des différentes étapes du pendu en affichage console
+        /// </summary>
+        /// <value>
+        /// dessin.txt
+        /// </value>
         public const string ADRESSE_DESSIN = "dessin.txt" ;
+        
+        /// <summary>
+        /// adresse du descriptif des heuristiques
+        /// </summary>
+        /// <value>
+        /// heuristiques.txt
+        /// </value>
         public const string ADRESSE_HEURISTIQUE = "heuristiques.txt" ;
 
         // Dictionnaires
+        
+        /// <summary>
+        /// liste de tout les mots du dictionnaire
+        /// </summary>
         public static List<string> dictionnaire;
+        
+        /// <summary>
+        /// liste des mots utilisées au niveau 0
+        /// </summary>
         public static List<string> dictionnaireNiv0;
+        
+        /// <summary>
+        /// liste des mots utilisées au niveau 1
+        /// </summary>
         public static List<string> dictionnaireNiv1;
+        
+        /// <summary>
+        /// liste des mots utilisées au niveau 2
+        /// </summary>
         public static List<string> dictionnaireNiv2;
+        
+        /// <summary>
+        /// liste des mots utilisées au niveau 3
+        /// </summary>
         public static List<string> dictionnaireNiv3;
+        
+        /// <summary>
+        /// liste des mots utilisées lors de l'exécution
+        /// </summary>
+        /// /// <value>
+        /// dictionnaireNiv0 ou dictionnaireNiv1 ou dictionnaireNiv2 ou dictionnaireNiv3
+        /// </value>
         public static List<string> dictionnaireCourant;
 
-
+        /// <summary>
+        /// Représentation d'un joueur
+        /// Comporte toute les informations concenrnant un joueur
+        /// </summary>
+        /// <remarks>
+        /// le joueur possede un nom
+        /// le joueur est humain ou ordinateur
+        /// le joueur possède un nombre de victoire
+        /// le joueur possède un role (devine ou choisit le mot)
+        /// le joueur doit être ou non modifier
+        /// si c'est un ordinateur, le joueur possède un niveau d'heuristique (de 0 à 3)
+        /// </remarks>
         public struct Joueur {
             public string nom;
             public bool robot;
@@ -54,8 +190,9 @@ namespace Projet_pendu
         /// <summary>
         /// Charge chaque ligne d'un fichier dont l'adresse est passée en paramètre dans une liste de string.
         /// </summary>
-        /// <param name="adresse"></param>
-        /// <returns></returns>
+        /// <param name="adresse">adresse du fichier dans le projet</param>
+        /// <returns>la liste de toutes les lignes du fichier</returns>
+        /// <exception cref="System.IO.IOException">Lever si le fichier ne peut pas s'ouvrir 
         public static List<string> ChargeFichier (string adresse) {
             List<string> l = new List<string>(); // liste contenant les lignes du fichier à charger
             
@@ -84,16 +221,16 @@ namespace Projet_pendu
         /// <summary>
         /// Permet à un joueur j de jouer un coup, c'est-à-dire de proposer une lettre ou un mot, en fonction des lettres qui ont déjà été jouées précédement. Le comportement de la méthode diffère en fonction de si le j est un humain ou un robot. Si j est un robot, sont comportement dépendra du niveau n et des lettres déjà découvertes.
         /// </summary>
-        /// <param name="j"></param>
-        /// <param name="lettresDejaJouees"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <param name="niveau"></param>
-        /// <returns></returns>
+        /// <param name="j">joueur qui devine le mot</param>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="niveau">niveau de difficulté</param>
+        /// <returns>la lettre ou le mot jouée par j</returns>
         public static string JoueCoup (ref Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes, int niveau) {            
             string reponse=""; // la variable de retour
             string aide=(niveau<2)?", [3] pour recevoir une aide intelligente de l'ordinateur":""; // en deça d'un certain niveau, une aide intelligente est autorisée
             if (j.robot){ // cas ou j est un robot
-                if (! SIMULATION) { // en mode jeu, un message explicatif est affiché
+                if (! isSIMULATION) { // en mode jeu, un message explicatif est affiché
                     Console.WriteLine("C'est à {0} de deviner le mot.",j.nom);
                     Thread.Sleep(TEMPS_ATTENTE);
                 }
@@ -130,8 +267,8 @@ namespace Projet_pendu
         /// <summary>
         /// Revoit une lettre de l'alphabet aléatoire n'ayant pas déjà été jouée.
         /// </summary>
-        /// <param name="lettresDejaJouees"></param>
-        /// <returns></returns>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <returns>lettre jouée</returns>
         public static string CoupAleatoire (List<string> lettresDejaJouees){    
             string reponse; // varible de retour
             do { // on crée un entier aléatoire entre 65 et 97 (aplabet majuscule sur la table ASCII) qu'on transtype en char puis en string
@@ -147,9 +284,9 @@ namespace Projet_pendu
         /// <summary>
         /// Renvoit une lettre ou un mot en appliquant l'HeuristiqueProbabiliste sur les résultats de l'HeuristiqueCompatible.
         /// </summary>
-        /// <param name="lettresDejaJouees"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <returns></returns>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <returns>lettre jouée</returns>
         public static string HeuristiqueCombinee (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
             HeuristiqueMotCompatible (lettresDejaJouees, lettresDecouvertes, out List<string> motCompatibles); //la liste de mot compatible est récupérée
             return HeuristiqueProbabiliste (lettresDejaJouees, motCompatibles);
@@ -158,9 +295,9 @@ namespace Projet_pendu
         /// <summary>
         /// Renvoit la lettre la plus souvent présente dans une liste de mots et qui n'est pas une lettre déjà jouée.
         /// </summary>
-        /// <param name="lettresDejaJouees"></param>
-        /// <param name="mots"></param>
-        /// <returns></returns>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <param name="mots">liste de mot dans lesquels compter les lettres</param>
+        /// <returns>lettre jouée</returns>
         public static string HeuristiqueProbabiliste (List<string> lettresDejaJouees, List<string> mots){
             Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>(); // dictionnaire contenant chaque lettre et leur nombre d'occurence
             int prioriteMax=1; // occurence la plus ellevée 
@@ -193,10 +330,10 @@ namespace Projet_pendu
         /// Renvoit une lettre au hasard parmis celles présentent dans les mots compatibles, c'est 
         /// -à-dire présentant les lettres déjà découvertent au bon endroit et ne comportant pas les lettres déjà jouée et rejetées.
         /// </summary>
-        /// <param name="lettresDejaJouees"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <param name="motCompatibles"></param>
-        /// <returns></returns>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="motCompatibles">mot du dictionnaires courants considérés compatibles</param>
+        /// <returns>lettre jouée</returns>
         public static string HeuristiqueMotCompatible (List<string> lettresDejaJouees, char[] lettresDecouvertes, out List<string> motCompatibles){
             List<char> lettresAbsentes = new List<char>(); // lettres déjà jouées mais qui ne font pas parties du mot
             motCompatibles = new List<string>(); // liste des mots compatibles
@@ -229,19 +366,19 @@ namespace Projet_pendu
         /// <summary>
         /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différement en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvrtes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
         /// </summary>
-        /// <param name="j"></param>
-        /// <param name="mot"></param>
-        /// <param name="lettresDecouvertes"></param>
+        /// <param name="j">joueur choisissant le mot</param>
+        /// <param name="mot">mot choisit pour être deviné</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
         public static void ChoixMot (ref Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        int indexDico; // index du mot dans le dico
             bool motAccepte =false;
             string reponse="1"; // variable de retour
             Random rndIndex = new Random();
 
-            if (!SIMULATION) Console.WriteLine("C'est à {0} de choisir le mot.",j.nom);
+            if (!isSIMULATION) Console.WriteLine("C'est à {0} de choisir le mot.",j.nom);
 			
 			if(j.robot == true){ // si j est un robot, on choisit un mot au hasard dans le dictionnaire
-                if (!SIMULATION) Thread.Sleep(TEMPS_ATTENTE);
+                if (!isSIMULATION) Thread.Sleep(TEMPS_ATTENTE);
 				indexDico = rndIndex.Next(0, dictionnaireCourant.Count);
 				mot = dictionnaireCourant[indexDico].ToCharArray();
 			}
@@ -277,10 +414,10 @@ namespace Projet_pendu
         /// <summary>
         /// Vérifie si un mot est comporte les lettres découvertent au bon endroit et ne comporte pas les lettres absentes.
         /// </summary>
-        /// <param name="mot"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <param name="lettresAbsentes"></param>
-        /// <returns></returns>
+        /// <param name="mot">mot choisit pour être deviné</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="lettresAbsentes">lettre ne pouvant pas être présentes dans le mot</param>
+        /// <returns>vrai si le mot est compatible, faux sinon</returns>
         private static bool IsCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
             if (mot.Length != lettresDecouvertes.Length) return false; // si le mot n'est pas de la bonne taille il est rejetté
             for (int i=0; i<mot.Length;i++) { // sinon on vérifie chaque lettre
@@ -294,8 +431,8 @@ namespace Projet_pendu
         /// <summary>
         /// Verifie que la chaine s ne contient que des caractères autorisés, càd des lettres majuscules
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
+        /// <param name="s">chaine dont la légalité est a vérifier</param>
+        /// <returns>vrai si la chaine est légale, faux sinon</returns>
         public static bool IsChaineLegal (string s){
             bool retour = true; // variable de retour initialisé à true
             foreach (char lettre in s){
@@ -307,10 +444,10 @@ namespace Projet_pendu
         /// <summary>
         /// Vérifie si une lettre est présente dans un mot. Si oui, le tableau des lettres découvertes est mis à jour.
         /// </summary>
-        /// <param name="lettre"></param>
-        /// <param name="mot"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <returns></returns>
+        /// <param name="lettre">lettre dont on doit vérifié la présence</param>
+        /// <param name="mot">mot à l'intérieur duquel on cherche la lettre</param>
+        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <returns>vrai si la lettre est dans le mot, faux sinon</returns>
         public static bool IsLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
             bool res=false; //variable de retour initialisé à false
             for (int i=0; i<mot.Length;i++){
@@ -325,9 +462,9 @@ namespace Projet_pendu
         /// <summary>
         /// Vérifie si le tableau tab1 comporte les mêmes valeur que le tableau tab2
         /// </summary>
-        /// <param name="tab1"></param>
-        /// <param name="tab2"></param>
-        /// <returns></returns>
+        /// <param name="tab1">premier tableau de char</param>
+        /// <param name="tab2">second tableau de char</param>
+        /// <returns>vrai si les tableaux comportent les mêmes valeurs, faux sinon</returns>
         public static bool TestEgaliteTableau (char[] tab1, char[] tab2) {
             if (tab1.Length != tab2.Length ) return false; // si ils ne font pas la même taille alors ils sont différents
             for (int i=0; i<tab1.Length;i++){
@@ -341,7 +478,7 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche chaque lettre d'un tableau sur une ligne puis saute une ligne. 
         /// </summary>
-        /// <param name="tab"></param>
+        /// <param name="tab">tableau à afficher</param>
         public static void AfficheTab (char[] tab){
             foreach(char lettre in tab){
                 Console.Write(lettre);
@@ -353,9 +490,9 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche une liste de mot sur une même ligne séparer par un espace, en commençant à l'indice deb et finissant à l'indice limite.
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="limite"></param>
-        /// <param name="deb"></param>
+        /// <param name="l">liste de mot à afficher</param>
+        /// <param name="limite">indice de fin</param>
+        /// <param name="deb">indice de début</param>
         public static void AfficheListe (List<string> l, int limite, int deb){
             if (l.Count<limite) limite=l.Count; // si la limite dépasse la taille de la liste, elle est réduite
             if (deb<0) deb=0; // si l'indice de début est inférieur à 0, il est ramené à 0
@@ -369,8 +506,8 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche les limites premiers mots de la liste l, puis demande à l'utilisateur s'il désire continuer l'affichage.
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="limite"></param>
+        /// <param name="l">liste des mots du dictionnaire</param>
+        /// <param name="limite">nombre de mots à afficher</param>
         public static void AfficheDico (List<string> l, int limite){
             bool continu=true; // continu l'affichage
             int i=0; // indice de départ
@@ -388,7 +525,7 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche les règles du jeu stockées dans un fichier texte dont l'adresse est passé en paramètre.
         /// </summary>
-        /// <param name="adresse"></param>
+        /// <param name="adresse">adresse du fichier dans le projet</param>
         public static void AfficheRegles (string adresse){
             List<string> regles=ChargeFichier(adresse); // charge les ligne du fichier
             Console.WriteLine();
@@ -403,8 +540,8 @@ namespace Projet_pendu
         /// <summary>
         /// Dessine le pendu contenu dans la liste dessin en fonction d'un certain niveau d'avancement déterminé par le paramètre taille (entre 0 et 6)
         /// </summary>
-        /// <param name="taille"></param>
-        /// <param name="dessin"></param>
+        /// <param name="taille">état d'avancement du pendu</param>
+        /// <param name="dessin">liste de string constituant le dessin du pendu sur console</param>
         public static void DessinePendu (int taille, List<string> dessin){
             Console.Clear(); // le pendu écrase le dessin précédent plutôt que s'affiche à la suite
             int i=0; // indice du début du dessin dans la liste
@@ -417,7 +554,7 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche une ligne de texte au milieu de la console.
         /// </summary>
-        /// <param name="texte"></param>
+        /// <param name="texte">texte a afficher au centre de la console</param>
         private static void CentrerLeTexte(string texte){
             int nbEspaces = (Console.WindowWidth - texte.Length) / 2; // calcul de la position à laquelle mettre le curseur en fonction de la taille du mot
             if (nbEspaces>0) Console.SetCursorPosition(nbEspaces, Console.CursorTop); // si le texte à afficher est plus petit que la largeur de la console, le curseur est déplacé
@@ -427,8 +564,8 @@ namespace Projet_pendu
         /// <summary>
         /// Demande son nom au joueur.
         /// </summary>
-        /// <param name="nom"></param>
-        /// <param name="message"></param>
+        /// <param name="nom">nom du joueur</param>
+        /// <param name="message">message à afficher</param>
         public static void DemandeNom (ref string nom, string message){
             Console.WriteLine("Quelle est le nom {0} ?",message);
             nom= Console.ReadLine();
@@ -438,8 +575,8 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche les score des joueurs j1 et j2
         /// </summary>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
         public static void Score (Joueur j1, Joueur j2){
             Console.WriteLine("Fin de partie : \n score {0} : {1} \n score {2} : {3} ",j1.nom,j1.nbVictoire,j2.nom,j2.nbVictoire);
         }
@@ -447,10 +584,10 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche les informations nécessaire au joueur pour choisir un coup.
         /// </summary>
-        /// <param name="taillePendu"></param>
-        /// <param name="lettresDecouvertes"></param>
-        /// <param name="lettresDejaJouees"></param>
-        /// <param name="dessin"></param>
+        /// <param name="taillePendu">état d'avancement du pendu</param>
+        /// <param name="lettresDecouvertes">liste de lettre ayant déjà été proposées</param>
+        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
+        /// <param name="dessin">liste de string constituant le dessin du pendu sur console</param>
         public static void AfficheInfo (int taillePendu, char[] lettresDecouvertes, List<string> lettresDejaJouees, List<string> dessin){
             DessinePendu(taillePendu, dessin); // dessine le pendu à la bonne taille
             AfficheTab(lettresDecouvertes); // affiche les lettres déjà découvertes
@@ -463,9 +600,9 @@ namespace Projet_pendu
         /// <summary>
         /// Initialise les paramètres des structures j1 et j2 ainsi que n, qui determine le nombre d'itération en cas de simulation. 
         /// </summary>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
-        /// <param name="n"></param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
+        /// <param name="n">nombre d'itérations</param>
         public static void InitialisationJoueur (ref Joueur j1, ref Joueur j2, ref int n){
             int choixModeJeu; // variable permettant d'enregistrer les choix de l'utilisateur
 
@@ -544,15 +681,15 @@ namespace Projet_pendu
                 }
 
                 if (choixModeJeu==2) { // si l'utilisateur veut lancer une simulation, on lui demande de choisir un nombre d'itération
-                    SIMULATION=true;
+                    isSIMULATION=true;
                     Console.WriteLine("Choisissez un nombre n d'itérations du programmes :");
                     while (!int.TryParse(Console.ReadLine(),out n) ||  n<1 ){
                         Console.WriteLine("Valeur erronée, veuillez entrer un entier supérieur à 0.");
                     }
                 }
-                else SIMULATION=false;
+                else isSIMULATION=false;
             }
-            else SIMULATION=false;
+            else isSIMULATION=false;
         }
 
         /// <summary>
@@ -583,9 +720,9 @@ namespace Projet_pendu
         /// <summary>
         /// Choix du niveau du jeu.
         /// </summary>
-        /// <param name="niv"></param>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
+        /// <param name="niv">niveau de difficulté</param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
         public static void ChoixNiveau(ref int niv, ref Joueur j1, ref Joueur j2){
             // l'utilisateur choisit une difficulté
             Console.WriteLine("Choississez un niveau de difficulté [0,1,2,3]. Entrer -1 pour afficher le descriptifs des niveaux");
@@ -621,9 +758,9 @@ namespace Projet_pendu
         /// <summary>
         /// Permet à l'utilisateur de changer de mode de jeu (c'est à dire les caractèristiques des joueurs et le nombre d'itération en mode simulation)
         /// </summary>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
-        /// <param name="n"></param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
+        /// <param name="n">nombre d'itérations</param>
         public static void ChangementModeJeu (ref Joueur j1, ref Joueur j2, ref int n){
             int choixModeJeu; //permet d'enregistrer le choix de l'utilisateur
             Console.WriteLine("Voulez-vous changer le premier joueur [1], le second joueur [2], les deux [3] ?");
@@ -631,17 +768,17 @@ namespace Projet_pendu
                 Console.WriteLine("Valeur erronée, veuillez entrer 1, 2 ou 3.");
             }
             if (choixModeJeu== 1) { // si un seul des joueur est a initialisé, on lui dit aurevoir et lui affiche son score. L'autre joueur conserve son score pour la suivre
-                if (!SIMULATION) Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j1.nom,j1.nbVictoire);
+                if (!isSIMULATION) Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j1.nom,j1.nbVictoire);
                 j1.nbVictoire=0;
                 j1.aInitialiser=true;
             }
             if (choixModeJeu== 2) {
-                if (!SIMULATION) Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j2.nom,j2.nbVictoire);
+                if (!isSIMULATION) Console.WriteLine("Aurevoir {0} ! Votre score était de {1}.",j2.nom,j2.nbVictoire);
                 j2.nbVictoire=0;
                 j2.aInitialiser=true;
             }
             if (choixModeJeu== 3) { // si les deux joueurs sont a changer, les scores des deux sont affichés et remit à 0
-                if (!SIMULATION) Score( j1, j2);
+                if (!isSIMULATION) Score( j1, j2);
                 j1.nbVictoire=0;
                 j2.nbVictoire=0;
                 j1.aInitialiser=true;
@@ -653,10 +790,10 @@ namespace Projet_pendu
         /// <summary>
         /// Remplit la liste motsParTaille de mots de la liste l en fonction de leur taille et du niveau de difficlté.
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="longueurMot"></param>
-        /// <param name="modeDeDifficulte"></param>
-        /// <param name="motsParTaille"></param>
+        /// <param name="l">liste des mots du dictionnaire générale</param>
+        /// <param name="longueurMot">longueur limite du mot</param>
+        /// <param name="modeDeDifficulte">niveau de difficulté</param>
+        /// <param name="motsParTaille">liste de mots de taille conforme</param>
         public static void ModuleLongueurDuMot(List <string> l, uint longueurMot, uint modeDeDifficulte, List<string> motsParTaille){
 		foreach (string s in l)
             {
@@ -786,10 +923,10 @@ namespace Projet_pendu
         /// <summary>
         /// Initialise les variables nécessaires au démarage du programme (les joueurs, les dictionnaire et le niveau) 
         /// </summary>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
-        /// <param name="niveau"></param>
-        /// <param name="n"></param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
+        /// <param name="niveau">niveau de difficulté</param>
+        /// <param name="n">nombre d'itérations</param>
         public static void InitialisationProgramme (ref Joueur j1,ref Joueur j2, ref int niveau, ref int n){
             j1.aInitialiser=true;
             j2.aInitialiser=true;
@@ -801,20 +938,19 @@ namespace Projet_pendu
         /// <summary>
         /// Affiche un message de fin de partie et demande à l'utilisateur s'il veut continuer, changer de mode de jeu et de niveau.
         /// </summary>
-        /// <param name="perdu"></param>
-        /// <param name="taillePendu"></param>
-        /// <param name="mot"></param>
-        /// <param name="j1"></param>
-        /// <param name="j2"></param>
-        /// <param name="continuerAJouer"></param>
-        /// <param name="niveau"></param>
-        /// <param name="n"></param>
-        /// <param name="dessin"></param>
-        public static void MessageDeFin (bool perdu, int taillePendu, char[] mot, ref Joueur j1, ref Joueur j2, ref bool continuerAJouer, ref int niveau, ref int n, List<string> dessin){
+        /// <param name="perdu">indique si la partie était perdante</param>
+        /// <param name="mot">mot à deviner</param>
+        /// <param name="j1">premier joueur</param>
+        /// <param name="j2">second joueur</param>
+        /// <param name="continuerAJouer">indique si l'utilisateur désire continuer à jouer</param>
+        /// <param name="niveau">niveau de difficulté</param>
+        /// <param name="n">nombre d'itération</param>
+        /// <param name="dessin">liste de string constituant le dessin du pendu sur console</param>
+        public static void MessageDeFin (bool perdu, char[] mot, ref Joueur j1, ref Joueur j2, ref bool continuerAJouer, ref int niveau, ref int n, List<string> dessin){
             bool changement;
-            if (!SIMULATION){ // en cas de simulation, les résultats finaux ne s'affichent pas à chaque itération, juste à la fin
+            if (!isSIMULATION){ // en cas de simulation, les résultats finaux ne s'affichent pas à chaque itération, juste à la fin
                 if (perdu){
-                    DessinePendu(taillePendu,dessin);
+                    DessinePendu(MAX_PENDU,dessin);
                     Console.WriteLine ("{0}, vous avez perdu ! Le mot a deviner était :",(j1.role==DEVINE)?j1.nom:j2.nom);
                     AfficheTab(mot);
                 }
@@ -869,7 +1005,7 @@ namespace Projet_pendu
             InitialisationProgramme (ref j1,ref j2,ref niveau, ref n); //initialise les joueurs (robots ou humain), le niveau et le nombre d'itération maximal en cas de simulation
             
             while (continuerAJouer){ // en cas de simulation, on sort de la boucle principal après n itération du programme, il faut donc demander àl'utilisateur s'il veut continuer
-                while ((continuerAJouer && !SIMULATION) || (SIMULATION && nbIteration<n)){ // boucle principal du programme, qui s'arrête en mode jeu si l'utilisateur le demande ou en mode simulation lorsque n est atteint 
+                while ((continuerAJouer && !isSIMULATION) || (isSIMULATION && nbIteration<n)){ // boucle principal du programme, qui s'arrête en mode jeu si l'utilisateur le demande ou en mode simulation lorsque n est atteint 
                     Console.Clear(); // pour d'avantage de visibilité on nettoie la console à chaque round
                 
                     // choix du mot à faire deviner par j1 ou j2 en fonction de leur role
@@ -878,16 +1014,16 @@ namespace Projet_pendu
 
                     while (!(perdu || TestEgaliteTableau(mot,lettresDecouvertes))){ // l'autre joueur tente de deviner le mot ; on s'arrête au bout 6 erreurs, d'une proposition de mot erronée ou d'une victoire
                  
-                        if (!SIMULATION)  AfficheInfo ( taillePendu, lettresDecouvertes, lettresDejaJouees,dessin); // affiche le dessin du pendu et les informations de jeu en mode jeu
+                        if (!isSIMULATION)  AfficheInfo ( taillePendu, lettresDecouvertes, lettresDejaJouees,dessin); // affiche le dessin du pendu et les informations de jeu en mode jeu
 
                         // le joueur dont c'est le role cherche à deviner le mot
                         if (j1.role==DEVINE)  {
                             coup=JoueCoup(ref j1,lettresDejaJouees,lettresDecouvertes, niveau);
-                            if (!SIMULATION && j1.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j1.nom,coup); // en mode jeu, on affiche le coup joué par l'ordinateur
+                            if (!isSIMULATION && j1.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j1.nom,coup); // en mode jeu, on affiche le coup joué par l'ordinateur
                         }
                         else {
                             coup=JoueCoup(ref j2,lettresDejaJouees,lettresDecouvertes, niveau);
-                            if (!SIMULATION && j2.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j2.nom,coup);
+                            if (!isSIMULATION && j2.robot) Console.WriteLine("{0} joue le coup \"{1}\"",j2.nom,coup);
                         }
 
                         // le joueur humain peut abandonner la partie
@@ -916,7 +1052,7 @@ namespace Projet_pendu
                     }
                 
                     // en mode jeu, le message de fin s'affiche après chaque round
-                    if (!SIMULATION) MessageDeFin ( perdu,  taillePendu,  mot, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n,dessin);                
+                    if (!isSIMULATION) MessageDeFin ( perdu,  mot, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n,dessin);                
                 
                     // en cas de victoire, le nombre de victoire du joueur qui devine le mot s'incrémente
                     else if (!perdu){
@@ -938,7 +1074,7 @@ namespace Projet_pendu
 
                 // en mode simulation, les scores et le message de fin s'affiche après n itérations du programme
                 Score( j1, j2);
-                if (SIMULATION) MessageDeFin ( false,  0,  null, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n,dessin);
+                if (isSIMULATION) MessageDeFin ( false,  null, ref  j1, ref  j2, ref  continuerAJouer, ref  niveau, ref n,dessin);
                 nbIteration=0;   
             }
         }
