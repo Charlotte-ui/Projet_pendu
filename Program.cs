@@ -1,15 +1,16 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO ;
 using System.Linq;
 using System.Collections;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace Projet_pendu
 {
-    class Program
-    {
+    class Program    
+		{
 
         // Constantes de nomenclature, utiles pour la lisibilité du programme
         static bool SIMULATION = false;
@@ -222,6 +223,7 @@ namespace Projet_pendu
             char c = lettresCompatibles[i];
             return c.ToString();
         }
+
        
         /// <summary>
         /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différement en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvrtes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
@@ -563,10 +565,18 @@ namespace Projet_pendu
             dictionnaireNiv2= new List<string>();
             dictionnaireNiv3= new List<string>();
 
+
             ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0); // application du module longueur du mot
+
+            ModuleLongueurDuMot(dictionnaire,5,0,dictionnaireNiv0);
+            ModuleLettreCommunesRares(dictionnaire,0,dictionnaireNiv0);
+
             ModuleLongueurDuMot(dictionnaire,7,1,dictionnaireNiv1);
+            ModuleLettreCommunesRares(dictionnaire,1,dictionnaireNiv1);
             ModuleLongueurDuMot(dictionnaire,9,2,dictionnaireNiv2);
+            ModuleLettreCommunesRares(dictionnaire,2,dictionnaireNiv2);
             ModuleLongueurDuMot(dictionnaire,5,3,dictionnaireNiv3);
+            ModuleLettreCommunesRares(dictionnaire,3,dictionnaireNiv3);
         }
 
         /// <summary>
@@ -656,6 +666,121 @@ namespace Projet_pendu
 					if(s.Length >= longueurMot) motsParTaille.Add(s);
             }
         }
+
+
+       
+
+        public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParCommunRarete){
+        List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
+        List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
+	
+		foreach (String s in l)
+            {
+				if(modeDeDifficulte < 2){
+					int i = 0;
+					bool ceMotCorrespond = false;
+					while(i < s.Length-1 && !ceMotCorrespond){
+						for(int j = 0; j < lettresCommunes.Count; j++){		
+							if(s.Contains((string)lettresCommunes[j])){
+								motsParCommunRarete.Add(s);
+								ceMotCorrespond = true;
+							}
+						}
+						i++;
+					}
+					ceMotCorrespond = false;
+				}
+				else {
+					if(modeDeDifficulte == 2){
+					int i = 0;
+					bool uneLettreCommune = false;
+					bool uneLettreRare = false;
+					while(i < s.Length-1 && (!uneLettreCommune && !uneLettreRare)){
+						for(int j = 0; j < lettresCommunes.Count; j++){		
+							if(s.Contains((string)lettresCommunes[j])){
+								uneLettreCommune = true;
+							}
+						}
+						if(uneLettreCommune){
+							for(int k = 0; k < lettresRares.Count; k++){		
+								if(s.Contains((string)lettresRares[k])){
+									motsParCommunRarete.Add(s);
+									uneLettreRare = true;
+								}
+							}
+						}
+						i++;
+					}
+						uneLettreCommune = false;
+						uneLettreRare = false;
+					}
+					else{
+					int i = 0;
+					bool ceMotCorrespond = false;
+					while(i < s.Length-1 && !ceMotCorrespond){
+						for(int j = 0; j < lettresRares.Count; j++){		
+							if(s.Contains((string)lettresRares[j])){
+								motsParCommunRarete.Add(s);
+								ceMotCorrespond = true;
+							}
+						}
+						i++;
+					}
+					ceMotCorrespond = false;
+				}
+            }
+		}
+	}
+
+    public static void ModuleRepetitionLettre(List <string> l, uint modeDeDifficulte, List<string> motsParRepetOuNon){ 
+     
+        foreach (String s in l){ 
+            bool lettreRepetee = false;
+            if(modeDeDifficulte <= 1){
+                var vSorted = from letterOfS in s
+                     orderby letterOfS
+                     select letterOfS;
+                         
+                int i = 0;
+                string cSorted = vSorted.ToString();
+                char lettreActuelle = ' ';
+                char lettreSuivante = ' ';
+
+                while(!lettreRepetee && i < s.Length-1){
+                    
+                    lettreActuelle = cSorted[i];
+                    lettreSuivante = cSorted[i+1];  
+
+                    if(lettreActuelle == lettreSuivante){
+                        motsParRepetOuNon.Add(s);
+                        lettreRepetee = true;
+                    }
+                    i++;
+                }
+            }
+            else{
+                var vSorted = from letterOfS in s
+                     orderby letterOfS
+                     select letterOfS;
+                         
+                int i = 0;
+                string cSorted = vSorted.ToString();
+                char lettreActuelle = ' ';
+                char lettreSuivante = ' ';
+
+                while(!lettreRepetee && i < s.Length-1){
+                    
+                    lettreActuelle = cSorted[i];
+                    lettreSuivante = cSorted[i+1];  
+
+                    if(lettreActuelle == lettreSuivante) lettreRepetee = true;
+                    i++;
+                }
+                if(!lettreRepetee) motsParRepetOuNon.Add(s);
+            }
+        }
+    }
+
 
         /// <summary>
         /// Initialise les variables nécessaires au démarage du programme (les joueurs, les dictionnaire et le niveau) 
