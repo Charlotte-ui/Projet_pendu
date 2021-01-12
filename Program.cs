@@ -86,6 +86,12 @@ namespace Projet_pendu
         /// 2000
         /// </value>
         public const int TEMPS_ATTENTE = 2000 ;
+        /// <summary>
+        /// Limite de taille du dictionnaire utilisé
+        /// </summary>
+        /// /// <value>
+        /// 10000
+        /// </value>
         public const int LIMITE_DICOCOURANT = 10000 ;
 
 
@@ -148,20 +154,30 @@ namespace Projet_pendu
         /// Représentation d'un joueur
         /// Comporte toute les informations concenrnant un joueur
         /// </summary>
-        /// <remarks>
-        /// le joueur possede un nom
-        /// le joueur est humain ou ordinateur
-        /// le joueur possède un nombre de victoire
-        /// le joueur possède un role (devine ou choisit le mot)
-        /// le joueur doit être ou non modifier
-        /// si c'est un ordinateur, le joueur possède un niveau d'heuristique (de 0 à 3)
-        /// </remarks>
         public struct Joueur {
+            /// <summary>
+            /// le joueur possede un nom
+            /// </summary>
             public string nom;
+            /// <summary>
+            /// le joueur est humain ou ordinateur
+            /// </summary>
             public bool robot;
+            /// <summary>
+            /// le joueur possède un nombre de victoire
+            /// </summary>
             public int nbVictoire;
+            /// <summary>
+            /// le joueur possède un role (devine ou choisit le mot)
+            /// </summary>
             public bool role ; //true choisit mot, false devine
+            /// <summary>
+            /// le joueur doit être ou non modifier
+            /// </summary>
             public bool aInitialiser ; // quand on change de mot de jeu
+            /// <summary>
+            /// si c'est un ordinateur, le joueur possède un niveau d'heuristique (de 0 à 3)
+            /// </summary>
             public int niv ; // niveau de difficulté pour le robot
         }
 
@@ -171,7 +187,7 @@ namespace Projet_pendu
         /// </summary>
         /// <param name="adresse">adresse du fichier dans le projet</param>
         /// <returns>la liste de toutes les lignes du fichier</returns>
-        /// <exception cref="System.IO.IOException">Lever si le fichier ne peut pas s'ouvrir 
+        /// <exception cref="System.IO.IOException">Lever si le fichier ne peut pas s'ouvrir </exception>        
         public static List<string> ChargeFichier (string adresse) {
             List<string> l = new List<string>(); // liste contenant les lignes du fichier à charger
             
