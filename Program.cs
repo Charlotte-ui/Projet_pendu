@@ -230,8 +230,8 @@ namespace Projet_pendu
 
                 switch (j.niv) { // Le robot joue différement en fonction du niveau, avec des heuristiques d'efficacité croissante.
                     case 1 : return CoupAleatoire (lettresDejaJouees);
-                    case 2 : return HeuristiqueMotCompatible(lettresDejaJouees,lettresDecouvertes, out List<string> motCompatibles);
-                    case 3 : return HeuristiqueProbabiliste(lettresDejaJouees,dictionnaireCourant);
+                    case 2 : return HeuristiqueProbabiliste(lettresDejaJouees,dictionnaireCourant);
+                    case 3 : return HeuristiqueMotCompatible(lettresDejaJouees,lettresDecouvertes, out List<string> motCompatibles);
                     case 4 : return HeuristiqueCombinee(lettresDejaJouees,lettresDecouvertes);
                 }  
             }
@@ -653,7 +653,7 @@ namespace Projet_pendu
             if (j1.robot && j2.robot){ // si les deux joueurs sont des robots, l'utilisateur peut lancer une simulation ou une démonstration et choisir les heuristiques des robots
                 Console.WriteLine("Les deux joueurs sont des robots.");
 
-                Console.WriteLine("Choisissez une première heuristique pour {0}: aléatoire [1], par compatibilité de mots [2], par probabilité de lettres [3], les deux dernières combinées [4] (entrer [0] pour afficher le descriptif des heuristiques)",j1.nom);
+                Console.WriteLine("Choisissez une première heuristique pour {0}: aléatoire [1], par probabilité de lettres [2], par compatibilité de mots [3], les deux dernières combinées [4] (entrer [0] pour afficher le descriptif des heuristiques)",j1.nom);
                     while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 || choixModeJeu>4 ){
                         if (choixModeJeu==0) AfficheRegles(ADRESSE_HEURISTIQUE); // on affiche les descriptifs des heuristiques
                         else Console.WriteLine("Valeur erronée, veuillez entrer les chiffres 0,1,2,3 ou 4 uniquement.");
@@ -675,8 +675,8 @@ namespace Projet_pendu
                 if (choixModeJeu==2) { // si l'utilisateur veut lancer une simulation, on lui demande de choisir un nombre d'itération
                     isSIMULATION=true;
                     Console.WriteLine("Choisissez un nombre n d'itérations du programmes :");
-                    while (!int.TryParse(Console.ReadLine(),out n) ||  n<1 ){
-                        Console.WriteLine("Valeur erronée, veuillez entrer un entier supérieur à 0.");
+                    while (!int.TryParse(Console.ReadLine(),out n) ||  n<1 || n>dictionnaireCourant.Count){
+                        Console.WriteLine("Valeur erronée, veuillez entrer un entier supérieur à 0 et inférieur à {0} (taille di dictionnaire).", dictionnaireCourant.Count);
                     }
                 }
                 else isSIMULATION=false;
