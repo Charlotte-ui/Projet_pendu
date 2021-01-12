@@ -1,2 +1,52 @@
 Descriptifs des niveaux
-blabla
+Niveau 0 :
+----------
+Le mot :
+- Est composé de 5 lettres maximum,
+- Est composé d'au moins une fois les lettres les plus communes,
+- N'est pas composé des lettres les moins communes,
+- Est composé de lettres répétées.
+
+Autres caractéristiques :
+- Lorsqu'une lettre est déjà proposée, il n'y a pas de pénalités,
+- L'ordi lorsqu'il devine a un comportement aléatoire,
+- Aide intelligente disponible.
+
+Niveau 1 :
+----------
+Le mot :
+- Est composé de 7 lettres maximum,
+- Est composé d'au moins une fois les lettres les plus communes,
+- N'est pas composé des lettres les moins communes,
+- Est composé de lettres répétées.
+
+Autres caractéristiques :
+- Lorsqu'une lettre est déjà proposée, il n'y a pas de pénalités,
+- L'ordi lorsqu'il devine a un comportement aléatoire,
+- Aide intelligente disponible.
+
+Niveau 2 :
+----------
+Le mot :
+- Est composé de 9 lettres maximum,
+- Est composé d'au moins une fois les lettres les plus communes,
+- Est composé d'au moins une fois les lettres les moins communes,
+- N'est pas composé de lettres répétées.
+
+Autres caractéristiques :
+- Lorsqu'une lettre est déjà proposée, il y a une pénalité,
+- L'ordi lorsqu'il devine a un comportement aléatoire,
+- Pas d'Aide intelligente disponible.
+
+Niveau 3 :
+----------
+Le mot :
+- Est composé de 7 lettres minimum,
+- Est composé d'au moins une fois les lettres les plus communes,
+- Est composé d'au moins une fois les lettres les moins communes,
+- N'est pas composé de lettres répétées.
+
+Autres caractéristiques :
+- Lorsqu'une lettre est déjà proposée, il y a une pénalité,
+- L'ordi lorsqu'il devine a un comportement intelligent,
+- Pas d'Aide intelligente disponible.

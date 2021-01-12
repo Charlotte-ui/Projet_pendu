@@ -11,3 +11,16 @@
 /home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.dll
 /home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.pdb
 /home/chacha/GitHub/Projet_pendu/obj/Debug/netcoreapp3.1/Projet_pendu.genruntimeconfig.cache
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.exe
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.deps.json
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.runtimeconfig.json
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.runtimeconfig.dev.json
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.dll
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\bin\Debug\netcoreapp3.1\Projet_pendu.pdb
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.csprojAssemblyReference.cache
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.AssemblyInfoInputs.cache
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.AssemblyInfo.cs
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.csproj.CoreCompileInputs.cache
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.dll
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.pdb
+C:\Users\apinzi\Documents\GitHub\Projet_pendu\obj\Debug\netcoreapp3.1\Projet_pendu.genruntimeconfig.cache
