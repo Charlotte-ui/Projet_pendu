@@ -687,8 +687,8 @@ namespace Projet_pendu
         /// <summary>
         /// Initialisation des différents dictionnaires. Ceux qui servent à l'initialisation comme les intermédiaires.
         /// </summary>
-        /// <param name="niv"></param>
-        /// <param name="longueurMot"></param>
+        /// <param name="niv">niveau de difficulté</param>
+        /// <param name="longueurMot">restriction sur la taille du mot</param>
         public static void InitialisationDictionnaire (int niv, int longueurMot){
             List<string> dictionnairePreTri= new List<string>();
             List<string> dictionnaireParTaille= new List<string>();
@@ -765,8 +765,8 @@ namespace Projet_pendu
         /// <summary>
         /// Récupère une quantité LIMITE_DICOCOURANT limitée de mots de la liste l dans dictionnaireCourantPreTri
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="dictionnaireCourantPreTri"></param>
+        /// <param name="l">liste total des mots du dictionnaire</param>
+        /// <param name="dictionnaireCourantPreTri">liste de 1000 mots extrait de ce dictionnaire</param>
         public static void InitialisationDictionnaireCourant(List <string> l, List<string> dictionnaireCourantPreTri){
             Random rndIndexDico = new Random();
             for(int i = 1; i <= LIMITE_DICOCOURANT; i++){ //Cette boucle s'effectue jusqu'à la limite du dictionnaire courant définie en constante
@@ -777,7 +777,7 @@ namespace Projet_pendu
         }
 
         /// <summary>
-        /// Remplit la liste motsParTaille de mots de la liste l en fonction de leur taille et du niveau de difficlté.
+        /// Remplit la liste motsParTaille de mots de la liste l en fonction de leur taille et du niveau de difficulté.
         /// </summary>
         /// <param name="l">liste des mots du dictionnaire générale</param>
         /// <param name="longueurMot">longueur limite du mot</param>
@@ -786,7 +786,6 @@ namespace Projet_pendu
         public static void ModuleLongueurDuMot(List <string> l, int longueurMot, int modeDeDifficulte, List<string> motsParTaille){
 		foreach (string s in l)
             {
-                Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
 				if(modeDeDifficulte < 3){ // pour les bas niveau, les mots courts sont selectionnés
                     if(s.Length <= longueurMot) motsParTaille.Add(s);
 				}
@@ -804,7 +803,6 @@ namespace Projet_pendu
             bool ceMotCorrespond;
             foreach (String s in l) // pour chaque mot de la liste
             {
-                Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
                 ceMotCorrespond=false;
                 for(int j = 0; j < lettres.Count && !ceMotCorrespond; j++){ // pour chaque lettre commune, tant que le mot ne correpsond pas
                     if(s.Contains((string)lettres[j])){ // si le mot contient une des lettres communes
@@ -819,9 +817,9 @@ namespace Projet_pendu
         /// <summary>
         /// Remplit la liste motsParCommunRarete de mots de la liste l en fonction de la présence de mots rares, communs ou les deux.
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="modeDeDifficulte"></param>
-        /// <param name="motsParCommunRarete"></param>
+        /// <param name="l">liste de mot initiale</param>
+        /// <param name="modeDeDifficulte">niveau de difficulté</param>
+        /// <param name="motsParCommunRarete">liste triée</param>
         public static void ModuleLettreCommunesRares(List<string> l, int modeDeDifficulte, ref List<string> motsParCommunRarete){
         List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
         List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
@@ -841,13 +839,12 @@ namespace Projet_pendu
         /// <summary>
         /// Remplit la liste motsParRepetOuNon de mots de la liste l en fonction de la répétition ou non-répétition de lettres.
         /// </summary>
-        /// <param name="l"></param>
-        /// <param name="modeDeDifficulte"></param>
-        /// <param name="motsParCommunRarete"></param>
+        /// <param name="l">liste initiale</param>
+        /// <param name="modeDeDifficulte">niveau de difficulté</param>
+        /// <param name="motsParCommunRarete">liste triée</param>
         public static void ModuleRepetitionLettre(List<string> l, int modeDeDifficulte, List<string> motsParRepetOuNon){ 
         
             foreach (String s in l){  // pour chaque mot de la liste
-                Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
                 bool lettreRepetee = false;
                 int i = 0;
                 var cSorted = new String(s.OrderBy(c => c).ToArray()); //Les lettres sont triées par ordre alphabétique...
