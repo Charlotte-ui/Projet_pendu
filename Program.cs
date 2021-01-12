@@ -143,11 +143,9 @@ namespace Projet_pendu
         /// liste de tout les mots du dictionnaire
         /// </summary>
         public static List<string> dictionnaire;
-        public static List<string> dictionnairePreTri;
-        public static List<string> dictionnaireParTaille;
-        public static List<string> dictionnaireParCommunRarete;
-        public static List<string> dictionnaireParRepetition;
-
+        /// <summary>
+        /// dictionnaire utilisé lors de la partie, différent en fonction du niveau
+        /// </summary>
         public static List<string> dictionnaireCourant;
 
         /// <summary>
@@ -692,15 +690,15 @@ namespace Projet_pendu
         /// <param name="niv"></param>
         /// <param name="longueurMot"></param>
         public static void InitialisationDictionnaire (int niv, int longueurMot){
-            dictionnairePreTri= new List<string>();
-            dictionnaireParTaille= new List<string>();
-            dictionnaireParCommunRarete= new List<string>();
-            dictionnaireParRepetition = new List<string>();
+            List<string> dictionnairePreTri= new List<string>();
+            List<string> dictionnaireParTaille= new List<string>();
+            List<string> dictionnaireParCommunRarete= new List<string>();
+            List<string> dictionnaireParRepetition = new List<string>();
             dictionnaireCourant= new List<string>();
             dictionnaire=ChargeFichier(ADRESSE_DICO);
             InitialisationDictionnaireCourant(dictionnaire, dictionnairePreTri);
             ModuleLongueurDuMot(dictionnairePreTri, longueurMot, niv, dictionnaireParTaille); // application du module longueur du mot
-            ModuleLettreCommunesRares(dictionnaireParTaille, niv, dictionnaireParCommunRarete);
+            ModuleLettreCommunesRares(dictionnaireParTaille, niv, ref dictionnaireParCommunRarete);
             ModuleRepetitionLettre(dictionnaireParCommunRarete, niv, dictionnaireParRepetition);
             dictionnaireCourant = dictionnaireParRepetition;
         }
@@ -785,7 +783,7 @@ namespace Projet_pendu
         /// <param name="longueurMot">longueur limite du mot</param>
         /// <param name="modeDeDifficulte">niveau de difficulté</param>
         /// <param name="motsParTaille">liste de mots de taille conforme</param>
-        public static void ModuleLongueurDuMot(List <string> l, uint longueurMot, uint modeDeDifficulte, List<string> motsParTaille){
+        public static void ModuleLongueurDuMot(List <string> l, int longueurMot, int modeDeDifficulte, List<string> motsParTaille){
 		foreach (string s in l)
             {
                 Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
@@ -798,73 +796,46 @@ namespace Projet_pendu
         }
 
         /// <summary>
+        /// Remplit la liste listeTriee de mots de la liste l en fonction de la présence de lettres de la liste lettres.
+        /// </summary>
+        /// <param name="l">liste de référence</param>
+        /// <param name="motsParCommunRarete">liste triée</param>
+        public static void ContientListeLettre(List<string> l, List<string> listeTriee, List<string> lettres){
+            bool ceMotCorrespond;
+            foreach (String s in l) // pour chaque mot de la liste
+            {
+                Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
+                ceMotCorrespond=false;
+                for(int j = 0; j < lettres.Count && !ceMotCorrespond; j++){ // pour chaque lettre commune, tant que le mot ne correpsond pas
+                    if(s.Contains((string)lettres[j])){ // si le mot contient une des lettres communes
+                        if(!listeTriee.Contains(s))listeTriee.Add(s); // et s'il n'est pas déjà dans la liste, on l'ajoute
+                        ceMotCorrespond=true; // on indique que le mot correspond
+                    }
+                }   
+            }
+        }
+
+
+        /// <summary>
         /// Remplit la liste motsParCommunRarete de mots de la liste l en fonction de la présence de mots rares, communs ou les deux.
         /// </summary>
         /// <param name="l"></param>
         /// <param name="modeDeDifficulte"></param>
         /// <param name="motsParCommunRarete"></param>
-        public static void ModuleLettreCommunesRares(List<string> l, int modeDeDifficulte, List<string> motsParCommunRarete){
+        public static void ModuleLettreCommunesRares(List<string> l, int modeDeDifficulte, ref List<string> motsParCommunRarete){
         List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
         List<string> lettresRares = new List<string>(){"Z","Q","X","J"}; 
-        foreach (String s in l)
-            {
-                Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
-                    if(modeDeDifficulte < 2){ //Pour les modes de difficultés 0 à 1 : Les mots ont obligatoirement une lettre commune.
-                        int i = 0;
-                        bool ceMotCorrespond = false;
-                        while(i < s.Length-1 && !ceMotCorrespond){
-                            Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
-                            for(int j = 0; j < lettresCommunes.Count; j++){
-                                if(s.Contains((string)lettresCommunes[j])){
-                                    if(!motsParCommunRarete.Contains(s))motsParCommunRarete.Add(s);
-                                    ceMotCorrespond = true;
-                                }
-                            }
-                            i++;
-                        }
-                        ceMotCorrespond = false;
-                    }
-                    else {
-                        if(modeDeDifficulte == 2){ //Pour le mode difficulté 2 : Les mots ont obligatoirement une lettre commune et une lettre rare.
-                        int i = 0;
-                        bool uneLettreCommune = false;
-                        bool uneLettreRare = false;
-                        while(i < s.Length-1 && (!uneLettreCommune || !uneLettreRare)){ 
-                            for(int j = 0; j < lettresCommunes.Count; j++){	//On passe dans le tableau de lettresCommunes pour vérifier les correspondances avec la lettre analysée.	
-                                if(s.Contains((string)lettresCommunes[j])){
-                                    uneLettreCommune = true;
-                                }
-                            }
-                            if(uneLettreCommune){
-                                for(int k = 0; k < lettresRares.Count; k++){ //On passe dans le tableau de lettresRares pour vérifier les correspondances avec la lettre analysée.	
-                                    if(s.Contains((string)lettresRares[k])){
-                                        if(!motsParCommunRarete.Contains(s))motsParCommunRarete.Add(s);
-                                        uneLettreRare = true;
-                                    }
-                                }
-                            }
-                            i++;
-                        }
-                            uneLettreCommune = false;
-                            uneLettreRare = false;
-                        }
-                        else{ //Pour les modes de difficultés 3 : Les mots ont obligatoirement une lettre rare.
-                        int i = 0;
-                        bool ceMotCorrespond = false;
-                        while(i < s.Length-1 && !ceMotCorrespond){
-                            Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
-                            for(int j = 0; j < lettresRares.Count; j++){ //On passe dans le tableau de lettresRares pour vérifier les correspondances avec la lettre analysée.	
-                                if(s.Contains((string)lettresRares[j])){
-                                    if(!motsParCommunRarete.Contains(s))motsParCommunRarete.Add(s);
-                                    ceMotCorrespond = true;
-                                }
-                            }
-                            i++;
-                        }
-                        ceMotCorrespond = false;
-                    }
-                }
-            }
+        if(modeDeDifficulte < 2){ //Pour les modes de difficultés 0 à 1 : Les mots ont obligatoirement une lettre commune.
+            ContientListeLettre(l,motsParCommunRarete,lettresCommunes);
+                        
+        } else if(modeDeDifficulte == 2){ //Pour le mode difficulté 2 : Les mots ont obligatoirement une lettre commune et une lettre rare.
+            List<string> tmp = new List<string>();
+            ContientListeLettre(l,motsParCommunRarete,lettresCommunes);
+            ContientListeLettre(motsParCommunRarete,tmp,lettresRares);
+            motsParCommunRarete=tmp;              
+        } else{ //Pour les modes de difficultés 3 : Les mots ont obligatoirement une lettre rare.
+            ContientListeLettre(l,motsParCommunRarete,lettresRares);
+        }  
         }
 
         /// <summary>
@@ -875,42 +846,23 @@ namespace Projet_pendu
         /// <param name="motsParCommunRarete"></param>
         public static void ModuleRepetitionLettre(List<string> l, int modeDeDifficulte, List<string> motsParRepetOuNon){ 
         
-            foreach (String s in l){ 
+            foreach (String s in l){  // pour chaque mot de la liste
                 Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
                 bool lettreRepetee = false;
-                if(modeDeDifficulte <= 1){
-                    int i = 0;
-                    var cSorted = new String(s.OrderBy(c => c).ToArray()); //Les lettres sont triées par ordre alphabétique...
-                    char lettreActuelle = ' ';
-                    char lettreSuivante = ' ';
-
-                    while(!lettreRepetee && i < s.Length-1){
-                        lettreActuelle = cSorted[i]; //... Pour ensuite comparer la lettre actuelle et la suivante entre elles...
-                        lettreSuivante = cSorted[i+1];  
-
-                        if(lettreActuelle == lettreSuivante){  //... Et ainsi vérifier la répétition et ajouter le mot.
-                            if(!motsParRepetOuNon.Contains(s))motsParRepetOuNon.Add(s);
-                            lettreRepetee = true;
-                        }
-                        i++;
+                int i = 0;
+                var cSorted = new String(s.OrderBy(c => c).ToArray()); //Les lettres sont triées par ordre alphabétique...
+                char lettreActuelle = ' ';
+                char lettreSuivante = ' ';
+                while(!lettreRepetee && i < s.Length-1){
+                    lettreActuelle = cSorted[i]; //... Pour ensuite comparer la lettre actuelle et la suivante entre elles...
+                    lettreSuivante = cSorted[i+1];  
+                    if(lettreActuelle == lettreSuivante){  //... Et ainsi vérifier la répétition et ajouter le mot si la difficulté est basse.
+                        if(modeDeDifficulte <= 1) if(!motsParRepetOuNon.Contains(s))motsParRepetOuNon.Add(s);
+                        lettreRepetee = true;
                     }
+                    i++;
                 }
-                else{
-                    Console.WriteLine("Chargement... {0}/{1}",l.IndexOf(s),l.Count);
-                    int i = 0;
-                    var cSorted = new String(s.OrderBy(c => c).ToArray()); //Les lettres sont triées par ordre alphabétique...
-                    char lettreActuelle = ' ';
-                    char lettreSuivante = ' ';
-
-                    while(!lettreRepetee && i < s.Length-1){
-                        lettreActuelle = cSorted[i]; //... Pour ensuite comparer la lettre actuelle et la suivante entre elles...
-                        lettreSuivante = cSorted[i+1];  
-
-                        if(lettreActuelle == lettreSuivante) lettreRepetee = true; //... Et ainsi vérifier la répétition et arrêter de vérifier le mot (puisqu'il a au moins une lettre de répétée).
-                        i++;
-                    }
-                    if(!lettreRepetee) if(!motsParRepetOuNon.Contains(s))motsParRepetOuNon.Add(s); //Dans le cas où on a passé toutes les lettres sans jamais détecter de répétition, on ajoute le mot.
-                }
+                if(modeDeDifficulte > 1 && !lettreRepetee) if(!motsParRepetOuNon.Contains(s))motsParRepetOuNon.Add(s); //Dans le cas où on a passé toutes les lettres sans jamais détecter de répétition, on ajoute le mot si la difficulté est faible.
             }
         }
 
