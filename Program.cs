@@ -813,10 +813,7 @@ namespace Projet_pendu
 				else // pour les hauts niveau, les mots longs sont selectionnés
 					if(s.Length >= longueurMot) motsParTaille.Add(s);
             }
-        }
-
-
-       
+        }  
 
         public static void ModuleLettreCommunesRares(List <string> l, uint modeDeDifficulte, List<string> motsParCommunRarete){
         List<string> lettresCommunes = new List<string>(){"R","S","T","L","N","E"}; 
