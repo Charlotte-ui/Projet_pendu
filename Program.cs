@@ -11,18 +11,18 @@ namespace Projet_pendu
     /// Le jeu se joue en monde console avec une approche procédurale.
     /// </summary>
     /// <remarks>
-    /// Trois types de mode de jeu existe : humain contre humain, humain contre ordinateur, ordinateur contre ordinateur
-    /// 4 niveaux de difficultés sont disponibles
-    /// l'IA de l'ordinateur dispose de 3 heuristiques de choix + un mode aléatoire
-    /// Dans le mode de jeu ordinateur contre ordinateur, deux alternatives sont possibles : démonstration (voir le programme se dérouller) ou simulation (comparer l'efficacité des heuristiques sur n itérations)
+    /// Trois types de modes de jeu existent : humain contre humain, humain contre ordinateur, ordinateur contre ordinateur.
+    /// 4 niveaux de difficultés sont disponibles.
+    /// L'IA de l'ordinateur dispose de 3 heuristiques de choix + un mode aléatoire.
+    /// Dans le mode de jeu ordinateur contre ordinateur, deux alternatives sont possibles : démonstration (voir le programme se dérouler) ou simulation (comparer l'efficacité des heuristiques sur n itérations).
     /// </remarks>
 
     class Program
     {
 
-        // Constantes de nomenclature, utiles pour la lisibilité du programme
+        // Constantes de nomenclature, utiles pour la lisibilité du programme.
         /// <summary>
-        /// indique si le jeu est en mode simulation
+        /// Indique si le jeu est en mode simulation.
         /// </summary>
         /// <value>
         /// true ou false
@@ -30,7 +30,7 @@ namespace Projet_pendu
         static bool isSIMULATION = false;
 
         /// <summary>
-        /// rend plus lisible le rôle du joueur (choisir le mot ou le deviner)
+        /// Rend plus lisible le rôle du joueur (choisir le mot ou le deviner).
         /// </summary>
         /// <value>
         /// true
@@ -38,7 +38,7 @@ namespace Projet_pendu
         public const bool CHOIX_MOT = true;
         
         /// <summary>
-        /// rend plus lisible le rôle du joueur (choisir le mot ou le deviner)
+        /// Rend plus lisible le rôle du joueur (choisir le mot ou le deviner).
         /// </summary>
         /// <value>
         /// false
@@ -46,15 +46,15 @@ namespace Projet_pendu
         public const bool DEVINE = false;
         
         /// <summary>
-        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// Rend plus lisible les coups spéciaux (abandonner, voir les règles, recevoir de l'aide).
         /// </summary>
         /// <value>
-        /// "1""
+        /// "1"
         /// </value>
         public const string ABANDON = "1";
         
         /// <summary>
-        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// Rend plus lisible les coups spéciaux (abandonner, voir les règles, recevoir de l'aide).
         /// </summary>
         /// <value>
         /// "2"
@@ -62,7 +62,7 @@ namespace Projet_pendu
         public const string REGLES = "2";
         
         /// <summary>
-        /// rend plus lisible les coups spéciaux (abandonner, voir les régles, recevoir de l'aide)
+        /// Rend plus lisible les coups spéciaux (abandonner, voir les règles, recevoir de l'aide).
         /// </summary>
         /// <value>
         /// "3"
@@ -72,7 +72,7 @@ namespace Projet_pendu
         // Constantes numériques
         
         /// <summary>
-        /// nombre maximum d'étapes avant la fin du pendu, aka nombre d'erreure pour échouer
+        /// Nombre maximum d'étapes avant la fin du pendu, à savoir le nombre d'erreurs pour échouer.
         /// </summary>
         /// <value>
         /// 6
@@ -80,116 +80,116 @@ namespace Projet_pendu
         public const int MAX_PENDU = 6 ;
         
         /// <summary>
-        /// temps d'attente, en ms, après chacunne des actions de l'ordinateur, pour que l'humain ait le temps de les lire
+        /// Temps d'attente, en ms, après chacune des actions de l'ordinateur, pour que l'humain ait le temps de les lire.
         /// </summary>
         /// <value>
         /// 2000
         /// </value>
         public const int TEMPS_ATTENTE = 2000 ;
         /// <summary>
-        /// Limite de taille du dictionnaire utilisé
+        /// Limite de taille du dictionnaire utilisé.
         /// </summary>
         /// /// <value>
-        /// 10000
+        /// 75000
         /// </value>
-        public const int LIMITE_DICOCOURANT = 10000 ;
+        public const int LIMITE_DICOCOURANT = 75000 ;
 
 
         // Références d'adresses
         
         /// <summary>
-        /// adresse du dictionnaire principal
+        /// Adresse du dictionnaire principal.
         /// </summary>
         /// <value>
-        /// dicoFR.txt
+        /// "dicoFR.txt"
         /// </value>
         public const string ADRESSE_DICO = "dicoFR.txt" ;
         
         /// <summary>
-        /// adresse du descriptif des régles
+        /// Adresse du descriptif des régles.
         /// </summary>
         /// <value>
-        /// regles.txt
+        /// "regles.txt"
         /// </value>
         public const string ADRESSE_REGLES = "regles.txt" ;
         
         /// <summary>
-        /// adresse du descriptif des niveaux
+        /// Adresse du descriptif des niveaux.
         /// </summary>
         /// <value>
-        /// niveaux.txt
+        /// "niveaux.txt"
         /// </value>
         public const string ADRESSE_NIVEAUX = "niveaux.txt" ;
         
         /// <summary>
-        /// adresse du dessin des différentes étapes du pendu en affichage console
+        /// Adresse du dessin des différentes étapes du pendu en affichage console.
         /// </summary>
         /// <value>
-        /// dessin.txt
+        /// "dessin.txt"
         /// </value>
         public const string ADRESSE_DESSIN = "dessin.txt" ;
         
         /// <summary>
-        /// adresse du descriptif des heuristiques
+        /// Adresse du descriptif des heuristiques.
         /// </summary>
         /// <value>
-        /// heuristiques.txt
+        /// "heuristiques.txt"
         /// </value>
         public const string ADRESSE_HEURISTIQUE = "heuristiques.txt" ;
 
         // Dictionnaires
         
         /// <summary>
-        /// liste de tout les mots du dictionnaire
+        /// Liste de tous les mots du dictionnaire.
         /// </summary>
         public static List<string> dictionnaire;
         /// <summary>
-        /// dictionnaire utilisé lors de la partie, différent en fonction du niveau
+        /// Dictionnaire utilisé lors de la partie, différent en fonction du niveau.
         /// </summary>
         public static List<string> dictionnaireCourant;
 
         /// <summary>
-        /// Représentation d'un joueur
-        /// Comporte toute les informations concenrnant un joueur
+        /// Représentation d'un joueur.
+        /// Comporte toute les informations concernant un joueur.
         /// </summary>
         public struct Joueur {
             /// <summary>
-            /// le joueur possede un nom
+            /// Le joueur possède un nom.
             /// </summary>
             public string nom;
             /// <summary>
-            /// le joueur est humain ou ordinateur
+            /// Le joueur est un humain ou ordinateur.
             /// </summary>
             public bool robot;
             /// <summary>
-            /// le joueur possède un nombre de victoire
+            /// Le joueur possède un nombre de victoires.
             /// </summary>
             public int nbVictoire;
             /// <summary>
-            /// le joueur possède un role (devine ou choisit le mot)
+            /// Le joueur possède un role (devine ou choisi le mot).
             /// </summary>
-            public bool role ; //true choisit mot, false devine
+            public bool role ; // true => choisi mot, false => devine
             /// <summary>
-            /// le joueur doit être ou non modifier
+            /// Le joueur doit être ou non modifié.
             /// </summary>
-            public bool aInitialiser ; // quand on change de mot de jeu
+            public bool aInitialiser ; // Quand on change de mot de jeu.
             /// <summary>
-            /// si c'est un ordinateur, le joueur possède un niveau d'heuristique (de 0 à 3)
+            /// Si c'est un ordinateur, le joueur possède un niveau d'heuristique (de 0 à 3).
             /// </summary>
-            public int niv ; // niveau de difficulté pour le robot
+            public int niv ; // Niveau de difficulté pour le robot.
         }
 
         
         /// <summary>
         /// Charge chaque ligne d'un fichier dont l'adresse est passée en paramètre dans une liste de string.
         /// </summary>
-        /// <param name="adresse">adresse du fichier dans le projet</param>
-        /// <returns>la liste de toutes les lignes du fichier</returns>
-        /// <exception cref="System.IO.IOException">Lever si le fichier ne peut pas s'ouvrir </exception>        
+        /// <param name="adresse">Adresse du fichier dans le projet.</param>
+        /// <returns>La liste de toutes les lignes du fichier.</returns>
+        /// <exception cref="System.IO.IOException">A lever si le fichier ne peut pas s'ouvrir. </exception>        
         public static List<string> ChargeFichier (string adresse) {
-            List<string> l = new List<string>(); // liste contenant les lignes du fichier à charger
+            List<string> l = new List<string>(); // Liste contenant les lignes du fichier à charger.
             
-            // un flux est ouvert en lecture. Si c'est possible, chaque ligne du fichier est lue et ajouter à l. Sinon une exception est levée.
+            // Un flux est ouvert en lecture. Si c'est possible, chaque ligne du fichier est lue et ajouté à l. Sinon une exception est levée.
             try 
             { 
                 System.Text.Encoding encoding = System.Text.Encoding.GetEncoding("iso-8859-1");
@@ -212,102 +212,102 @@ namespace Projet_pendu
     // Méthodes du jeu ------------------------------------------------------
 
         /// <summary>
-        /// Permet à un joueur j de jouer un coup, c'est-à-dire de proposer une lettre ou un mot, en fonction des lettres qui ont déjà été jouées précédement. Le comportement de la méthode diffère en fonction de si le j est un humain ou un robot. Si j est un robot, sont comportement dépendra du niveau n et des lettres déjà découvertes.
+        /// Permet à un joueur j de jouer un coup, c'est-à-dire de proposer une lettre ou un mot, en fonction des lettres qui ont déjà été jouées précédement. Le comportement de la méthode diffère en fonction de si le j est un humain ou un robot. Si j est un robot, son comportement dépendra du niveau n et des lettres déjà découvertes.
         /// </summary>
-        /// <param name="j">joueur qui devine le mot</param>
-        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
-        /// <param name="niveau">niveau de difficulté</param>
-        /// <returns>la lettre ou le mot jouée par j</returns>
+        /// <param name="j">Joueur qui devine le mot.</param>
+        /// <param name="lettresDejaJouees">Liste de lettres ayant déjà été proposées.</param>
+        /// <param name="lettresDecouvertes">Tableaux avec les lettres découvertes aux bons endroits, '_' sinon.</param>
+        /// <param name="niveau">Niveau de difficulté.</param>
+        /// <returns>La lettre ou le mot joué par j.</returns>
         public static string JoueCoup (ref Joueur j,List<string> lettresDejaJouees, char[] lettresDecouvertes, int niveau) {            
-            string reponse=""; // la variable de retour
-            string aide=(niveau<2)?", [3] pour recevoir une aide intelligente de l'ordinateur":""; // en deça d'un certain niveau, une aide intelligente est autorisée
-            if (j.robot){ // cas ou j est un robot
-                if (! isSIMULATION) { // en mode jeu, un message explicatif est affiché
+            string reponse=""; // La variable de retour.
+            string aide=(niveau<2)?", [3] pour recevoir une aide intelligente de l'ordinateur":""; // En deçà d'un certain niveau, une aide intelligente est autorisée.
+            if (j.robot){ // Cas ou j est un robot.
+                if (! isSIMULATION) { // En mode jeu, un message explicatif est affiché.
                     Console.WriteLine("C'est à {0} de deviner le mot.",j.nom);
                     Thread.Sleep(TEMPS_ATTENTE);
                 }
 
-                switch (j.niv) { // le robot joue différement en fonction du niveau, avec des heuristiques d'efficacité croissante.
+                switch (j.niv) { // Le robot joue différement en fonction du niveau, avec des heuristiques d'efficacité croissante.
                     case 1 : return CoupAleatoire (lettresDejaJouees);
                     case 2 : return HeuristiqueMotCompatible(lettresDejaJouees,lettresDecouvertes, out List<string> motCompatibles);
                     case 3 : return HeuristiqueProbabiliste(lettresDejaJouees,dictionnaireCourant);
                     case 4 : return HeuristiqueCombinee(lettresDejaJouees,lettresDecouvertes);
                 }  
             }
-            else { // cas ou j est humain
-                // on demande à l'utilisateur de proposer une réponse
+            else { // Cas où j est humain.
+                // On demande à l'utilisateur de proposer une réponse.
                 Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles {1}) ", j.nom,aide);
                 reponse = Console.ReadLine().ToUpper();
                
-               // tant que sa réponse contient des caractères invalides (voir IsChaineLegal) ou, en-deçà d'un certain niveau, déjà joués précédement, on redemande une réponse à l'utilisateur
+               // Tant que sa réponse contient des caractères invalides (voir IsChaineLegal) ou, en deçà d'un certain niveau, déjà joués précédement, on redemande une réponse à l'utilisateur.
                 while (( (niveau<2 && lettresDejaJouees.Contains(reponse)) || !IsChaineLegal(reponse) || reponse.Equals(REGLES)) && !reponse.Equals(ABANDON) && !(reponse.Equals(AIDE) && niveau<2)){
                     if (!IsChaineLegal(reponse) && !reponse.Equals(REGLES))  Console.WriteLine("Vous avez saisi un caractères non autorisé, veuillez recommencer.");
                     else if (niveau<2 && lettresDejaJouees.Contains(reponse)) Console.WriteLine("Cette lettre a déjà été jouée, choisissez en une autre.");
-                    else if (reponse.Equals(REGLES)) { // l'utilisateur peut demander à voir s'afficher les règles
+                    else if (reponse.Equals(REGLES)) { // L'utilisateur peut demander à voir s'afficher les règles.
                         AfficheRegles(ADRESSE_REGLES);
                         Console.WriteLine("{0}, quelle lettre ou mot proposez vous ? (entrer [1] pour abandonner, [2] pour afficher les règles {1})", j.nom,aide);
                     }
-                    reponse = Console.ReadLine().ToUpper(); // tout les mots du dictionnaire étant en majuscule, la réponse de l'utilisateur est automatiquement mise en capitale pour éviter les problèmes de casse
+                    reponse = Console.ReadLine().ToUpper(); // Tous les mots du dictionnaire étant en majuscules, la réponse de l'utilisateur est automatiquement mise en lettres capitales pour éviter les problèmes de casse.
                            
                 }
-                if (lettresDejaJouees.Contains(reponse)) reponse=""; // si une lettre a déjà été ajouté, et qu'on est en niveau 2 ou 3, alors elle compte comme une erreure (une chaine vide provoquera une erreure)
-                else if (reponse.Length==1 && !reponse.Equals(AIDE)) lettresDejaJouees.Add(reponse) ; // si l'utilisateir joue une lettre, elle est ajoutée à la liste des lettres déjà jouées
+                if (lettresDejaJouees.Contains(reponse)) reponse=""; // Si une lettre a déjà été ajoutée, et qu'on est en niveau 2 ou 3, alors elle compte comme une erreur (une chaine vide provoquera une erreur).
+                else if (reponse.Length==1 && !reponse.Equals(AIDE)) lettresDejaJouees.Add(reponse) ; // Si l'utilisateur joue une lettre, elle est ajoutée à la liste des lettres déjà jouées.
             }
             return reponse;
         }
 
         /// <summary>
-        /// Revoit une lettre de l'alphabet aléatoire n'ayant pas déjà été jouée.
+        /// Renvoie une lettre de l'alphabet aléatoire n'ayant pas déjà été jouée.
         /// </summary>
-        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
-        /// <returns>lettre jouée</returns>
+        /// <param name="lettresDejaJouees">Liste de lettres ayant déjà été proposées.</param>
+        /// <returns>Lettre jouée.</returns>
         public static string CoupAleatoire (List<string> lettresDejaJouees){    
-            string reponse; // varible de retour
-            do { // on crée un entier aléatoire entre 65 et 97 (aplabet majuscule sur la table ASCII) qu'on transtype en char puis en string
+            string reponse; // Variable de retour.
+            do { // On crée un entier aléatoire entre 65 et 97 (alphabet majuscule sur la table ASCII) qu'on transtype en char puis en string.
                 int i = new Random().Next(65, 91); 
                 char c = (char) i;
                 reponse = c.ToString();
             }
-            while (lettresDejaJouees.Contains(reponse)); // on recommence tant que la lettre à déjà été jouée
-            lettresDejaJouees.Add(reponse); // la lettre jouée est ajouté à la liste des lettres déjà jouées
+            while (lettresDejaJouees.Contains(reponse)); // On recommence tant que la lettre à déjà été jouée.
+            lettresDejaJouees.Add(reponse); // La lettre jouée est ajoutée à la liste des lettres déjà jouées.
             return reponse;
         }
       
         /// <summary>
-        /// Renvoit une lettre ou un mot en appliquant l'HeuristiqueProbabiliste sur les résultats de l'HeuristiqueCompatible.
+        /// Renvoie une lettre ou un mot en appliquant l'HeuristiqueProbabiliste sur les résultats de l'HeuristiqueCompatible.
         /// </summary>
-        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
-        /// <returns>lettre jouée</returns>
+        /// <param name="lettresDejaJouees">Liste de lettres ayant déjà été proposées.</param>
+        /// <param name="lettresDecouvertes">Tableaux avec les lettres découvertes au bons endroits, '_' sinon.</param>
+        /// <returns>Lettre jouée.</returns>
         public static string HeuristiqueCombinee (List<string> lettresDejaJouees, char[] lettresDecouvertes){    
             HeuristiqueMotCompatible (lettresDejaJouees, lettresDecouvertes, out List<string> motCompatibles); //la liste de mot compatible est récupérée
             return HeuristiqueProbabiliste (lettresDejaJouees, motCompatibles);
         }
 
         /// <summary>
-        /// Renvoit la lettre la plus souvent présente dans une liste de mots et qui n'est pas une lettre déjà jouée.
+        /// Renvoie la lettre la plus souvent présente dans une liste de mots et qui n'est pas une lettre déjà jouée.
         /// </summary>
-        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
-        /// <param name="mots">liste de mot dans lesquels compter les lettres</param>
-        /// <returns>lettre jouée</returns>
+        /// <param name="lettresDejaJouees">Liste de lettres ayant déjà été proposées.</param>
+        /// <param name="mots">Liste de mots dans lesquels les lettres sont comptées.</param>
+        /// <returns>Lettre jouée.</returns>
         public static string HeuristiqueProbabiliste (List<string> lettresDejaJouees, List<string> mots){
-            Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>(); // dictionnaire contenant chaque lettre et leur nombre d'occurence
-            int prioriteMax=1; // occurence la plus ellevée 
-            char lettreLaPlusPrioritaire='?'; // lettre ayant la plus grande occurence
+            Dictionary<char,int> lettresPriorisees = new Dictionary<char, int>(); // Dictionnaire contenant chaque lettre et leur nombre d'occurences.
+            int prioriteMax=1; // Occurence la plus élevée. 
+            char lettreLaPlusPrioritaire='?'; // Lettre ayant la plus grande occurence.
 
-            foreach(string mot in mots){ // pour tout les mots de la liste
-                foreach (char lettre in mot) // et pour chaque lettre de ces mots
+            foreach(string mot in mots){ // Pour tous les mots de la liste.
+                foreach (char lettre in mot) // Et pour chaque lettre de ces mots.
                 {
-                    if (!lettresDejaJouees.Contains(lettre.ToString())){ // si la lettre n'a pas déjà été jouée
-                        if (lettresPriorisees.ContainsKey(lettre)){ //  on augmente son nombre d'occurence
+                    if (!lettresDejaJouees.Contains(lettre.ToString())){ // Si la lettre n'a pas déjà été jouée...
+                        if (lettresPriorisees.ContainsKey(lettre)){ //  ...On augmente son nombre d'occurence.
                             lettresPriorisees[lettre]++;
-                            if (lettresPriorisees[lettre]>prioriteMax){ // si son nombre d'occurence est supérieur au maximum
-                               prioriteMax=lettresPriorisees[lettre] ; // elle devient la lettre prioritaire
+                            if (lettresPriorisees[lettre]>prioriteMax){ // Si son nombre d'occurence est supérieur au maximum...
+                               prioriteMax=lettresPriorisees[lettre] ; // ...Elle devient la lettre prioritaire.
                                lettreLaPlusPrioritaire=lettre;
                             }
                         }
-                        else { // ou si elle n'est pas encore présente on l'ajoute avec une priorité de 1
+                        else { // Ou si elle n'est pas encore présente on l'ajoute avec une priorité de 1.
                             lettresPriorisees.Add(lettre,1); 
                             if (lettreLaPlusPrioritaire=='?') lettreLaPlusPrioritaire=lettre;
                         }
@@ -315,30 +315,30 @@ namespace Projet_pendu
 
                 }
             }
-            lettresDejaJouees.Add(lettreLaPlusPrioritaire.ToString()); // la lettre prioritaire à la fin est renvoyée
+            lettresDejaJouees.Add(lettreLaPlusPrioritaire.ToString()); // La lettre prioritaire à la fin est renvoyée.
             return lettreLaPlusPrioritaire.ToString();
         }
 
         /// <summary>
-        /// Renvoit une lettre au hasard parmis celles présentent dans les mots compatibles, c'est 
-        /// -à-dire présentant les lettres déjà découvertent au bon endroit et ne comportant pas les lettres déjà jouée et rejetées.
+        /// Renvoie une lettre au hasard parmis celles présentent dans les mots compatibles,  
+        /// c'est-à-dire présentant les lettres déjà découvertent au bon endroit et ne comportant pas les lettres déjà jouées et rejetées.
         /// </summary>
-        /// <param name="lettresDejaJouees">liste de lettre ayant déjà été proposées</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
-        /// <param name="motCompatibles">mot du dictionnaires courants considérés compatibles</param>
-        /// <returns>lettre jouée</returns>
+        /// <param name="lettresDejaJouees">Liste de lettres ayant déjà été proposées.</param>
+        /// <param name="lettresDecouvertes">Tableaux avec les lettres découvertes aux bons endroits, '_' sinon.</param>
+        /// <param name="motCompatibles">Mots du dictionnaire courant considérés comme compatibles</param>
+        /// <returns>Lettre jouée.</returns>
         public static string HeuristiqueMotCompatible (List<string> lettresDejaJouees, char[] lettresDecouvertes, out List<string> motCompatibles){
-            List<char> lettresAbsentes = new List<char>(); // lettres déjà jouées mais qui ne font pas parties du mot
-            motCompatibles = new List<string>(); // liste des mots compatibles
-            List<char> lettresCompatibles = new List<char>(); // lettres des mots compatibles
+            List<char> lettresAbsentes = new List<char>(); // Lettres déjà jouées mais qui ne font pas partie du mot.
+            motCompatibles = new List<string>(); // Liste des mots compatibles.
+            List<char> lettresCompatibles = new List<char>(); // Lettres des mots compatibles.
 
-            // on rempli la liste des lettres absentes
+            // On remplit la liste des lettres absentes.
             foreach (string s in lettresDejaJouees)
             {
                 if(!lettresDecouvertes.Contains(Char.Parse(s))) lettresAbsentes.Add(Char.Parse(s));
             }
 
-            // on vérifie la compatibilité de chaque mot du dictionnaire et en récupère les lettres
+            // On vérifie la compatibilité de chaque mot du dictionnaire et on récupère les lettres.
             foreach(string mot in dictionnaireCourant){
                 if (IsCompatible(mot,lettresDecouvertes,lettresAbsentes)){
                     motCompatibles.Add(mot);
@@ -348,19 +348,19 @@ namespace Projet_pendu
                 }
             }
 
-            if (motCompatibles.Count()==1) return motCompatibles[0]; // si un seul mot est compatible il est renvoyé
+            if (motCompatibles.Count()==1) return motCompatibles[0]; // Si un seul mot est compatible il est renvoyé.
 
-            int i = new Random().Next(0, lettresCompatibles.Count()); // sinon est renvoyé une lettre au hasard parmis la liste
+            int i = new Random().Next(0, lettresCompatibles.Count()); // Sinon il est renvoyé une lettre au hasard parmi la liste.
             char c = lettresCompatibles[i];
             return c.ToString();
         }
        
         /// <summary>
-        /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différement en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvrtes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
+        /// Permet au joueur j de choisir un mot dans le dictionnaire courant. Il se comporte différemment en fonction de si j est un robot ou un humain. Le mot est initialisé comme une liste de char, et les lettres découvertes sont initialisées comme un tableau de même taille contenat uniquement les caractères - et _.
         /// </summary>
-        /// <param name="j">joueur choisissant le mot</param>
-        /// <param name="mot">mot choisit pour être deviné</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="j">Joueur choisissant le mot.</param>
+        /// <param name="mot">Mot choisi pour être deviné.</param>
+        /// <param name="lettresDecouvertes">Tableau avec les lettres découvertes aux bons endroits, '_' sinon</param>
         public static void ChoixMot (ref Joueur j, out char[] mot, out char[] lettresDecouvertes){
 	        int indexDico; // index du mot dans le dico
             bool motAccepte =false;
@@ -369,13 +369,13 @@ namespace Projet_pendu
 
             if (!isSIMULATION) Console.WriteLine("C'est à {0} de choisir le mot.",j.nom);
 			
-			if(j.robot == true){ // si j est un robot, on choisit un mot au hasard dans le dictionnaire
+			if(j.robot == true){ // si j est un robot, on choisi un mot au hasard dans le dictionnaire
                 if (!isSIMULATION) Thread.Sleep(TEMPS_ATTENTE);
 				indexDico = rndIndex.Next(0, dictionnaireCourant.Count);
 				mot = dictionnaireCourant[indexDico].ToCharArray();
 			}
 			else{
-                while (!motAccepte) { // sinon, l'utilisateur choisit un mot dans le dictionnaire
+                while (!motAccepte) { // sinon, l'utilisateur choisi un mot dans le dictionnaire
                     while (reponse.Equals("1")){
                         Console.WriteLine("Choisissez un mot parmi la liste. Taper [1] pour afficher la liste.");
                         reponse = Console.ReadLine();
@@ -406,8 +406,8 @@ namespace Projet_pendu
         /// <summary>
         /// Vérifie si un mot est comporte les lettres découvertent au bon endroit et ne comporte pas les lettres absentes.
         /// </summary>
-        /// <param name="mot">mot choisit pour être deviné</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="mot">mot choisi pour être deviné</param>
+        /// <param name="lettresDecouvertes">Tableau avec les lettres découvertes au bons endroits, '_' sinon</param>
         /// <param name="lettresAbsentes">lettre ne pouvant pas être présentes dans le mot</param>
         /// <returns>vrai si le mot est compatible, faux sinon</returns>
         private static bool IsCompatible (string mot, char[] lettresDecouvertes,List<char> lettresAbsentes){
@@ -438,7 +438,7 @@ namespace Projet_pendu
         /// </summary>
         /// <param name="lettre">lettre dont on doit vérifié la présence</param>
         /// <param name="mot">mot à l'intérieur duquel on cherche la lettre</param>
-        /// <param name="lettresDecouvertes">tableaux avec les lettres découvertes au bons endroits, '_' sinon</param>
+        /// <param name="lettresDecouvertes">Tableau avec les lettres découvertes au bons endroits, '_' sinon</param>
         /// <returns>vrai si la lettre est dans le mot, faux sinon</returns>
         public static bool IsLettreDansMot (char lettre, char[] mot, char[] lettresDecouvertes){
             bool res=false; //variable de retour initialisé à false
@@ -456,7 +456,7 @@ namespace Projet_pendu
         /// </summary>
         /// <param name="tab1">premier tableau de char</param>
         /// <param name="tab2">second tableau de char</param>
-        /// <returns>vrai si les tableaux comportent les mêmes valeurs, faux sinon</returns>
+        /// <returns>vrai si les Tableau comportent les mêmes valeurs, faux sinon</returns>
         public static bool TestEgaliteTableau (char[] tab1, char[] tab2) {
             if (tab1.Length != tab2.Length ) return false; // si ils ne font pas la même taille alors ils sont différents
             for (int i=0; i<tab1.Length;i++){
@@ -658,7 +658,7 @@ namespace Projet_pendu
                         if (choixModeJeu==0) AfficheRegles(ADRESSE_HEURISTIQUE); // on affiche les descriptifs des heuristiques
                         else Console.WriteLine("Valeur erronée, veuillez entrer les chiffres 0,1,2,3 ou 4 uniquement.");
                     }
-                j1.niv=choixModeJeu; // on initialise le niveau du robot en fonction de l'heuristique choisit
+                j1.niv=choixModeJeu; // on initialise le niveau du robot en fonction de l'heuristique choisi
 
                 Console.WriteLine("Choisissez une seconde heuristique pour {0} :",j2.nom);
                     while (!int.TryParse(Console.ReadLine(),out choixModeJeu) ||  choixModeJeu<1 || choixModeJeu>4 ){
@@ -698,8 +698,8 @@ namespace Projet_pendu
             dictionnaire=ChargeFichier(ADRESSE_DICO);
             InitialisationDictionnaireCourant(dictionnaire, dictionnairePreTri);
             ModuleLongueurDuMot(dictionnairePreTri, longueurMot, niv, dictionnaireParTaille); // application du module longueur du mot
-            ModuleLettreCommunesRares(dictionnaireParTaille, niv, ref dictionnaireParCommunRarete);
-            ModuleRepetitionLettre(dictionnaireParCommunRarete, niv, dictionnaireParRepetition);
+            ModuleLettreCommunesRares(dictionnaireParTaille, niv, ref dictionnaireParCommunRarete); // application du module mot commun/rare
+            ModuleRepetitionLettre(dictionnaireParCommunRarete, niv, dictionnaireParRepetition); // application du module mots répétés/non-répétés
             dictionnaireCourant = dictionnaireParRepetition;
         }
 
@@ -710,7 +710,7 @@ namespace Projet_pendu
         /// <param name="j1">premier joueur</param>
         /// <param name="j2">second joueur</param>
         public static void ChoixNiveau(ref int niv, ref Joueur j1, ref Joueur j2){
-            // l'utilisateur choisit une difficulté
+            // l'utilisateur choisi une difficulté
             int[] tabLongueur = new int[] { 5, 7, 9, 7 }; //En fonction de la difficulté, un chiffre sera sauvegardé dans une variable
             Console.WriteLine("Choisissez un niveau de difficulté [0,1,2,3]. Entrer -1 pour afficher le descriptifs des niveaux");
             while (!int.TryParse(Console.ReadLine(),out niv) || !(niv==0 || niv==1 || niv==2 || niv==3)){
@@ -724,7 +724,7 @@ namespace Projet_pendu
                 InitialisationDictionnaire (niv, longueurMot);
                 
 
-            if (!(j1.robot && j2.robot)) { // si un seul des joueurs ou moins est un robot (mode jeu), son comportement dépend du niveau choisit
+            if (!(j1.robot && j2.robot)) { // si un seul des joueurs ou moins est un robot (mode jeu), son comportement dépend du niveau choisi
                 j1.niv=niv;
                 j2.niv=niv;
             }
@@ -770,7 +770,6 @@ namespace Projet_pendu
         public static void InitialisationDictionnaireCourant(List <string> l, List<string> dictionnaireCourantPreTri){
             Random rndIndexDico = new Random();
             for(int i = 1; i <= LIMITE_DICOCOURANT; i++){ //Cette boucle s'effectue jusqu'à la limite du dictionnaire courant définie en constante
-                Console.WriteLine("Importation... {0}/{1}",i,LIMITE_DICOCOURANT);
                 int index = rndIndexDico.Next(l.Count); //Génère un index d'une valeur aléatoire comprise entre 0 et le nombre d'elements dans la liste du dictionnaire
                 dictionnaireCourantPreTri.Add(l[index]); //On ajoute l'élément aléatoire depuis le dictionnaire
             }
@@ -939,7 +938,7 @@ namespace Projet_pendu
             bool continuerAJouer=true; // recommence une partie ou arrête le programme en fonction de l'utilisateur
             bool perdu = false; // défaite du joueur qui devine le mot
             string coup; // coup du joueur qui devine le mot (une lettre ou un mot)
-            char [] mot, lettresDecouvertes; // mot à deviner choisit par un joueur et les lettres correctements deviner par l'autre 
+            char [] mot, lettresDecouvertes; // mot à deviner choisi par un joueur et les lettres correctements deviner par l'autre 
             Joueur j1 = new Joueur(); // premier joueur
             Joueur j2 = new Joueur(); // second joueur
             List<string> lettresDejaJouees = new List<string>(); // lettres déjà jouées, vraies ou fausses
@@ -975,7 +974,7 @@ namespace Projet_pendu
                         // le joueur humain peut demander de l'aide
                         else if (coup.Equals(AIDE)) {
                             coup = HeuristiqueCombinee(lettresDejaJouees, lettresDecouvertes) ; // on fait appel à l'heuristique la plus efficace pour jouer à la place de l'humain
-                            Console.WriteLine("L'ordinateur choisit pour vous la réponse \"{0}\"",coup);
+                            Console.WriteLine("L'ordinateur choisi pour vous la réponse \"{0}\"",coup);
                             if (coup.Length==1) {
                                 lettresDejaJouees.Add(coup);
                                 IsLettreDansMot(char.Parse(coup), mot, lettresDecouvertes);
@@ -983,7 +982,7 @@ namespace Projet_pendu
                             Thread.Sleep(TEMPS_ATTENTE); 
                         }
                     
-                        // si la taille du coup joué est de 1, alors c'est une lettre ; si elle n'est pas présente dans le mot à deviner, alors c'est une erreure
+                        // si la taille du coup joué est de 1, alors c'est une lettre ; si elle n'est pas présente dans le mot à deviner, alors c'est une erreur
                         else if (coup.Length==1) {
                             if (!IsLettreDansMot(char.Parse(coup), mot, lettresDecouvertes)) taillePendu++; 
                         }
